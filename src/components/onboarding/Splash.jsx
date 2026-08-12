@@ -23,7 +23,11 @@ export default function Splash({ onNext }) {
         </p>
         <p
           className='text-gray-800 w-full'
-          style={{ fontFamily: "'Racing Sans One', cursive", fontSize: '48px', lineHeight: 'normal' }}
+          style={{
+            fontFamily: "'Racing Sans One', cursive",
+            fontSize: '48px',
+            lineHeight: 'normal',
+          }}
         >
           Before Buy
         </p>

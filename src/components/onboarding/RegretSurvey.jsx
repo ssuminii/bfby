@@ -11,17 +11,21 @@ export default function RegretSurvey({ onNext }) {
     setSelected((prev) => (prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]))
 
   return (
-    <div className='relative w-full h-full bg-gray-50'>
-      <img src='/category-bg.svg' alt='' className='absolute inset-0 w-full h-full' />
-
+    <div className='relative w-full h-full bg-white'>
       <div
         className='absolute flex flex-col items-center gap-[10px] text-center w-[277px]'
         style={{ top: '166px', left: '58.5px' }}
       >
-        <p className='text-title font-bold text-gray-800 w-full' style={{ letterSpacing: '-0.4px', lineHeight: 1.5 }}>
+        <p
+          className='text-title font-bold text-gray-800 w-full'
+          style={{ letterSpacing: '-0.4px', lineHeight: 1.5 }}
+        >
           최근 후회했던 소비가 있었나요?
         </p>
-        <div className='w-full text-gray-500 font-medium' style={{ fontSize: '13px', letterSpacing: '-0.13px' }}>
+        <div
+          className='w-full text-gray-500 font-medium'
+          style={{ fontSize: '13px', letterSpacing: '-0.13px' }}
+        >
           <p style={{ lineHeight: 1.5 }}>있다면 비포바이가 다음 리포트에 참고하여 알려드려요.</p>
           <p style={{ lineHeight: 1.5 }}>딱히 없다면 건너뛰어도 괜찮아요.</p>
         </div>
