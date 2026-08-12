@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import Button from '../components/Button'
 
 const STEPS = ['splash', 'intro', 'category']
 
@@ -75,7 +76,29 @@ function Splash({ onNext }) {
 }
 
 function Intro({ onNext }) {
-  return <div className='flex flex-col h-full px-6' />
+  return (
+    <div className="relative w-full h-full bg-gradient-to-b from-blue-300 to-blue-50">
+      <img src="/intro-bg.svg" alt="" className="absolute inset-0 w-full h-full" />
+
+      <p
+        className="absolute left-1/2 -translate-x-1/2 text-title font-bold text-gray-800 text-center"
+        style={{ top: '166px', letterSpacing: '-0.4px', lineHeight: 1.5, whiteSpace: 'pre' }}
+      >
+        {'반가워요!\n\n비포바이는 합리적인 소비를 위해\n구매 전 조언해주는 AI 서비스에요.'}
+      </p>
+
+      <div
+        className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2"
+        style={{ top: 'calc(50% + 40.5px)', width: '374px', height: '249px' }}
+      >
+        <img src="/intro-character.png" alt="" className="absolute inset-0 w-full h-full object-cover" />
+      </div>
+
+      <div className="absolute" style={{ top: '758px', left: '24px' }}>
+        <Button onClick={onNext} variant="dark">다음으로</Button>
+      </div>
+    </div>
+  )
 }
 
 function Category({ onNext }) {
