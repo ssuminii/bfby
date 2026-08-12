@@ -12,8 +12,8 @@ fix/#이슈번호-작업내용   → 버그 수정
 **예시**
 
 ```
-feat/#12-link-input-page
-fix/#34-ogimage-parse-error
+feat/12-link-input-page
+fix/34-ogimage-parse-error
 ```
 
 ---
