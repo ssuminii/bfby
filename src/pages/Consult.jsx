@@ -1,10 +1,19 @@
 import { useState } from 'react'
-
-const STEPS = ['input', 'analyzing', 'questions', 'judging', 'report']
+import QuestionSurvey from '../components/consult/QuestionSurvey'
 
 export default function Consult() {
-  const [step, setStep] = useState('input')
-  const [data, setData] = useState({ url: '', product: null, answers: {} })
+  const [step, setStep] = useState('questions')
+  const [, setAnswers] = useState([])
 
-  return <div className='flex flex-col h-full'>{/* step별 컴포넌트 나중에 여기에 */}</div>
+  const finishQuestions = (result) => {
+    setAnswers(result)
+    setStep('judging')
+  }
+
+  return (
+    <div className='flex flex-col h-full bg-white'>
+      {step === 'questions' && <QuestionSurvey onDone={finishQuestions} />}
+      {step === 'judging' && <div className='flex-1' />}
+    </div>
+  )
 }

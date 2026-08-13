@@ -11,19 +11,16 @@ export default function RegretSurvey({ onNext }) {
     setSelected((prev) => (prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]))
 
   return (
-    <div className='relative w-full h-full bg-white'>
-      <div
-        className='absolute flex flex-col items-center gap-[10px] text-center w-[277px]'
-        style={{ top: '166px', left: '58.5px' }}
-      >
+    <div className='flex flex-col h-full bg-white'>
+      <div className='h-[33%] min-h-[140px] shrink flex flex-col items-center justify-end gap-[10px] text-center px-6 pb-[34px]'>
         <p
-          className='text-title font-bold text-gray-800 w-full'
+          className='text-title font-bold text-gray-800'
           style={{ letterSpacing: '-0.4px', lineHeight: 1.5 }}
         >
           최근 후회했던 소비가 있었나요?
         </p>
         <div
-          className='w-full text-gray-500 font-medium'
+          className='text-gray-500 font-medium'
           style={{ fontSize: '13px', letterSpacing: '-0.13px' }}
         >
           <p style={{ lineHeight: 1.5 }}>있다면 비포바이가 다음 리포트에 참고하여 알려드려요.</p>
@@ -31,11 +28,8 @@ export default function RegretSurvey({ onNext }) {
         </div>
       </div>
 
-      <div className='absolute bottom-0 left-0 w-full h-[572px] bg-gray-50 rounded-tl-[50px] rounded-tr-[50px] drop-shadow-[0px_0px_3px_rgba(0,0,0,0.12)]'>
-        <div
-          className='absolute grid grid-cols-3 grid-rows-2 gap-[9px] h-[89px] w-[345px]'
-          style={{ top: '24px', left: '24px' }}
-        >
+      <div className='flex-1 min-h-0 flex flex-col bg-gray-50 rounded-tl-[50px] rounded-tr-[50px] drop-shadow-[0px_0px_3px_rgba(0,0,0,0.12)] px-6 pt-6 pb-[42px]'>
+        <div className='grid grid-cols-3 grid-rows-2 gap-[9px] h-[89px] shrink-0'>
           {CATEGORIES.map((cat) => (
             <Button
               key={cat}
@@ -49,9 +43,9 @@ export default function RegretSurvey({ onNext }) {
         </div>
 
         <div
-          className={`absolute w-[345px] h-[56px] flex items-center rounded-[16px] transition-colors
+          className={`mt-5 flex items-center shrink-0 h-[56px] rounded-[16px] transition-colors
             ${reason ? 'bg-white border-2 border-blue-500' : 'bg-gray-100'}`}
-          style={{ top: '133px', left: '24px', paddingLeft: '30px', paddingRight: '30px' }}
+          style={{ paddingLeft: '30px', paddingRight: '30px' }}
         >
           <input
             type='text'
@@ -66,13 +60,12 @@ export default function RegretSurvey({ onNext }) {
 
         <button
           onClick={onNext}
-          className='absolute flex items-center justify-center w-[345px] h-[44px] text-[12px] font-semibold text-gray-500'
-          style={{ top: '209px', left: '24px' }}
+          className='mt-5 flex items-center justify-center shrink-0 h-[44px] text-[12px] font-semibold text-gray-500'
         >
           지금은 건너뛰기
         </button>
 
-        <div className='absolute' style={{ bottom: '42px', left: '24px' }}>
+        <div className='mt-auto pt-4'>
           <Button onClick={onNext} variant={selected.length > 0 ? 'dark' : 'default'}>
             다음으로
           </Button>
