@@ -1,17 +1,22 @@
 const styles = {
   default: {
     colors: 'bg-gray-100 text-gray-500',
-    size: 'w-[345px] h-[52px] rounded-[12px] text-body1 font-bold flex items-center justify-center',
+    size: 'w-full h-[52px] rounded-[12px] text-body1 font-bold flex items-center justify-center',
     spacing: '-0.16px',
   },
   active: {
     colors: 'bg-blue-500 text-white',
-    size: 'w-[345px] h-[52px] rounded-[12px] text-body1 font-bold flex items-center justify-center',
+    size: 'w-full h-[52px] rounded-[12px] text-body1 font-bold flex items-center justify-center',
+    spacing: '-0.16px',
+  },
+  secondary: {
+    colors: 'bg-gray-100 text-gray-500',
+    size: 'w-full h-[52px] rounded-[12px] text-body1 font-bold flex items-center justify-center',
     spacing: '-0.16px',
   },
   dark: {
     colors: 'bg-gray-800 text-white',
-    size: 'w-[345px] h-[52px] rounded-[12px] text-body1 font-bold flex items-center justify-center',
+    size: 'w-full h-[52px] rounded-[12px] text-body1 font-bold flex items-center justify-center',
     spacing: '-0.16px',
   },
   chip: {

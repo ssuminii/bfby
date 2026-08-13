@@ -35,7 +35,7 @@ export default function Splash({ onNext }) {
 
       <div
         className='absolute left-1/2 -translate-x-1/2'
-        style={{ top: '719px', width: '491px', height: '366px' }}
+        style={{ bottom: '-233px', width: '491px', height: '366px' }}
       >
         <div className='absolute' style={{ inset: '-8.2% -6.11%' }}>
           <img src='/splash-ellipse.svg' alt='' className='block w-full h-full' />
@@ -43,8 +43,8 @@ export default function Splash({ onNext }) {
       </div>
 
       <div
-        className='absolute left-1/2 -translate-x-1/2 -translate-y-1/2'
-        style={{ top: 'calc(50% + 238.39px)', width: '82.64px', height: '196.79px' }}
+        className='absolute left-1/2 -translate-x-1/2'
+        style={{ bottom: '89px', width: '82.64px', height: '196.79px' }}
       >
         <img src='/splash-character.svg' alt='' className='absolute inset-0 block w-full h-full' />
       </div>
