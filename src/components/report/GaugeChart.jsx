@@ -1,14 +1,15 @@
 const SEGMENTS = [
-  { id: "error", color: "var(--color-report-gauge-error)" },
-  { id: "caution", color: "var(--color-report-gauge-caution)" },
-  { id: "info", color: "var(--color-report-gauge-info)" },
+  { id: "error", color: "var(--color-report-gauge-error)", to: 30 },
+  { id: "caution", color: "var(--color-report-gauge-caution)", to: 70 },
+  { id: "info", color: "var(--color-report-gauge-info)", to: 100 },
 ];
 
 const CX = 100;
-const CY = 100;
-const R = 71;
-const STROKE = 50;
-const GAP = 5;
+const CY = 99;
+const OUTER = 96;
+const INNER = 42;
+const CORNER = 3;
+const GAP = 1.5;
 const DEPTH = 4;
 const NEEDLE_LENGTH = 60;
 const NEEDLE_HALF = 11;
@@ -20,23 +21,35 @@ const lighten = (color, amount) =>
 const darken = (color, amount) =>
   `color-mix(in srgb, ${color} ${100 - amount}%, black)`;
 
+const toDeg = (rad) => (rad * 180) / Math.PI;
+
+const angleOf = (score) => 180 + score * 1.8;
+
 const polar = (r, deg) => {
   const rad = (deg * Math.PI) / 180;
   return [CX + r * Math.cos(rad), CY + r * Math.sin(rad)];
 };
 
-const arcPath = (from, to) => {
-  const [x1, y1] = polar(R, from);
-  const [x2, y2] = polar(R, to);
-  return `M ${x1} ${y1} A ${R} ${R} 0 0 1 ${x2} ${y2}`;
+const wedgePath = (from, to) => {
+  const ro = OUTER - CORNER;
+  const ri = INNER + CORNER;
+  const insetO = toDeg(CORNER / ro);
+  const insetI = toDeg(CORNER / ri);
+  const [x1, y1] = polar(ro, from + insetO);
+  const [x2, y2] = polar(ro, to - insetO);
+  const [x3, y3] = polar(ri, to - insetI);
+  const [x4, y4] = polar(ri, from + insetI);
+  return `M ${x1} ${y1} A ${ro} ${ro} 0 0 1 ${x2} ${y2} L ${x3} ${y3} A ${ri} ${ri} 0 0 0 ${x4} ${y4} Z`;
 };
 
 export default function GaugeChart({ value = 0, className = "" }) {
   const score = Math.min(100, Math.max(0, value));
-  const span = (180 - GAP * (SEGMENTS.length - 1)) / SEGMENTS.length;
   const arcs = SEGMENTS.map((segment, i) => {
-    const from = 180 + i * (span + GAP);
-    return { ...segment, d: arcPath(from, from + span) };
+    const from =
+      angleOf(i === 0 ? 0 : SEGMENTS[i - 1].to) + (i === 0 ? 0 : GAP / 2);
+    const last = i === SEGMENTS.length - 1;
+    const to = angleOf(segment.to) - (last ? 0 : GAP / 2);
+    return { ...segment, d: wedgePath(from, to) };
   });
 
   return (
@@ -53,7 +66,7 @@ export default function GaugeChart({ value = 0, className = "" }) {
             id={`gauge-face-${id}`}
             gradientUnits="userSpaceOnUse"
             x1={0}
-            y1={CY - 96}
+            y1={CY - OUTER}
             x2={0}
             y2={CY}
           >
@@ -87,42 +100,31 @@ export default function GaugeChart({ value = 0, className = "" }) {
           <stop offset="0%" stopColor="white" />
           <stop offset="100%" stopColor="var(--color-gray-100)" />
         </radialGradient>
-
-        {/* stroke 는 objectBoundingBox 계산에서 빠지므로 필터 영역을 뷰박스 전체로 고정 */}
-        <filter
-          id="gauge-shadow"
-          filterUnits="userSpaceOnUse"
-          x="0"
-          y="0"
-          width="200"
-          height="126"
-        >
-          <feDropShadow dx="0" dy="2" stdDeviation="2" floodOpacity="0.18" />
-        </filter>
       </defs>
 
-      <g filter="url(#gauge-shadow)">
-        {arcs.map(({ id, color, d }) => (
-          <path
-            key={`depth-${id}`}
-            d={d}
-            transform={`translate(0 ${DEPTH})`}
-            stroke={darken(color, 32)}
-            strokeWidth={STROKE}
-            fill="none"
-          />
-        ))}
+      {/* 아래로 밀어 그린 어두운 복제본 = 입체 옆면 */}
+      {arcs.map(({ id, color, d }) => (
+        <path
+          key={`depth-${id}`}
+          d={d}
+          transform={`translate(0 ${DEPTH})`}
+          fill={darken(color, 32)}
+          stroke={darken(color, 32)}
+          strokeWidth={CORNER * 2}
+          strokeLinejoin="round"
+        />
+      ))}
 
-        {arcs.map(({ id, d }) => (
-          <path
-            key={`face-${id}`}
-            d={d}
-            stroke={`url(#gauge-face-${id})`}
-            strokeWidth={STROKE}
-            fill="none"
-          />
-        ))}
-      </g>
+      {arcs.map(({ id, d }) => (
+        <path
+          key={`face-${id}`}
+          d={d}
+          fill={`url(#gauge-face-${id})`}
+          stroke={`url(#gauge-face-${id})`}
+          strokeWidth={CORNER * 2}
+          strokeLinejoin="round"
+        />
+      ))}
 
       <g
         className="transition-transform duration-700 ease-out"
@@ -137,17 +139,10 @@ export default function GaugeChart({ value = 0, className = "" }) {
           stroke="url(#gauge-needle)"
           strokeWidth={6}
           strokeLinejoin="round"
-          filter="url(#gauge-shadow)"
         />
       </g>
 
-      <circle
-        cx={CX}
-        cy={CY}
-        r={HUB_OUTER}
-        fill="url(#gauge-hub)"
-        filter="url(#gauge-shadow)"
-      />
+      <circle cx={CX} cy={CY} r={HUB_OUTER} fill="url(#gauge-hub)" />
       <circle cx={CX} cy={CY} r={HUB_INNER} fill="url(#gauge-hub-inner)" />
     </svg>
   );
