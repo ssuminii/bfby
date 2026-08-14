@@ -1,7 +1,7 @@
 const SEGMENTS = [
-  { id: "error", color: "#DD4821" },
-  { id: "caution", color: "#DEB040" },
-  { id: "info", color: "#558EEA" },
+  { id: "error", color: "var(--color-report-gauge-error)" },
+  { id: "caution", color: "var(--color-report-gauge-caution)" },
+  { id: "info", color: "var(--color-report-gauge-info)" },
 ];
 
 const CX = 100;
