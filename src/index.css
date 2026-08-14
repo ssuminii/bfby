@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 @theme {
   /* Primary */
@@ -14,6 +14,7 @@
   --color-gray-100: #edeff2;
   --color-gray-300: #c6cbd2;
   --color-gray-500: #b8b9ba;
+  --color-gray-600: #8b909a;
   --color-gray-800: #23262b;
 
   /* Semantic */
@@ -22,8 +23,18 @@
   --color-caution: #c98a2e;
   --color-error: #d9483d;
 
+  /* Report - background-gradation */
+  --color-report-recommend: #d6e5ff;
+  --color-report-hold: #fff4d6;
+  --color-report-avoid: #e2e2e2;
+
+  /* Report - gague */
+  --color-report-gauge-error: #dd4821;
+  --color-report-gauge-caution: #deb040;
+  --color-report-gauge-info: #558eea;
+
   /* Font */
-  --font-suit: 'SUIT', sans-serif;
+  --font-suit: "SUIT", sans-serif;
 
   /* Font sizes */
   --text-display: 32px;
@@ -50,7 +61,7 @@
 }
 
 body {
-  font-family: 'SUIT', sans-serif;
+  font-family: "SUIT", sans-serif;
   background-color: #f7f8fa;
   min-height: 100vh;
   display: flex;

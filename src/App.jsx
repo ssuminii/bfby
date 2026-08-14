@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Onboarding from './pages/Onboarding'
 import Consult from './pages/Consult'
+import Report from './pages/Report'
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Onboarding />} />
               <Route path="/consult" element={<Consult />} />
+              <Route path="/report" element={<Report />} />
             </Routes>
           </div>
         </div>
