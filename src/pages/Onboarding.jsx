@@ -8,6 +8,7 @@ import ProductConfirm from '../components/onboarding/ProductConfirm'
 
 export default function Onboarding() {
   const [step, setStep] = useState('splash')
+  const [link, setLink] = useState('')
   const navigate = useNavigate()
 
   const next = () => {
@@ -23,8 +24,17 @@ export default function Onboarding() {
       {step === 'splash' && <Splash onNext={next} />}
       {step === 'intro' && <Intro onNext={next} />}
       {step === 'category' && <RegretSurvey onNext={next} />}
-      {step === 'link' && <LinkInput onNext={next} />}
-      {step === 'confirm' && <ProductConfirm onNext={next} onBack={() => setStep('link')} />}
+      {step === 'link' && (
+        <LinkInput
+          onNext={(value) => {
+            setLink(value)
+            next()
+          }}
+        />
+      )}
+      {step === 'confirm' && (
+        <ProductConfirm link={link} onNext={next} onBack={() => setStep('link')} />
+      )}
     </div>
   )
 }

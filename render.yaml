@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: bfby-api
+    runtime: node
+    plan: free
+    branch: dev
+    buildCommand: npm install
+    startCommand: node server/index.js
+    healthCheckPath: /api/health

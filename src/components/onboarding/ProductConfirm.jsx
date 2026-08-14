@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import Button from '../Button'
+import fetchProductInfo from '../../utils/fetchProductInfo'
 
 const MOCK_PRODUCT = {
   image: null,
@@ -8,8 +9,27 @@ const MOCK_PRODUCT = {
   tags: ['특징태그', '특징태그', '특징태그'],
 }
 
-export default function ProductConfirm({ product = MOCK_PRODUCT, onNext, onBack }) {
+export default function ProductConfirm({ link, onNext, onBack }) {
+  const [product, setProduct] = useState(MOCK_PRODUCT)
   const [phase, setPhase] = useState('idle') // idle | loading | done
+
+  // 링크에서 상품 정보 조회 — 실패하면 목데이터 유지
+  useEffect(() => {
+    if (!link) return
+    let alive = true
+    fetchProductInfo(link).then((info) => {
+      if (!alive || !info) return
+      setProduct((prev) => ({
+        ...prev,
+        name: info.name ?? prev.name,
+        image: info.image ?? prev.image,
+        price: info.price ?? prev.price,
+      }))
+    })
+    return () => {
+      alive = false
+    }
+  }, [link])
 
   useEffect(() => {
     if (phase === 'idle') return

@@ -88,7 +88,7 @@ export default function LinkInput({ onNext }) {
         )}
 
         <div className='mt-auto pt-4'>
-          <Button onClick={onNext} variant={link && !invalid ? 'dark' : 'default'}>
+          <Button onClick={() => onNext(link.trim())} variant={link && !invalid ? 'dark' : 'default'}>
             분석 맡기기
           </Button>
         </div>
