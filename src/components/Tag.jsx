@@ -7,7 +7,7 @@ export default function Tag({
 }) {
   return (
     <span
-      className={`inline-flex justify-center items-center gap-[10px] px-2
+      className={`inline-flex justify-center items-center gap-2.5 px-2
         rounded-full text-center text-body2 leading-[1.5] tracking-tight-1
         ${bg} ${text} ${weight} ${className}`}
     >

@@ -4,7 +4,7 @@ export default function Header({ title }) {
   const navigate = useNavigate();
 
   return (
-    <header className="relative h-[56px] flex items-center justify-center bg-white border-b border-gray-100">
+    <header className="relative h-14 flex items-center justify-center bg-white border-b border-gray-100">
       <button
         type="button"
         onClick={() => navigate(-1)}

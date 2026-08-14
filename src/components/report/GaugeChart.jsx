@@ -42,7 +42,7 @@ export default function GaugeChart({ value = 0, className = "" }) {
   return (
     <svg
       viewBox="0 0 200 126"
-      className={`w-[200px] ${className}`}
+      className={`w-50 ${className}`}
       role="img"
       aria-label={`게이지 ${score}점`}
     >
