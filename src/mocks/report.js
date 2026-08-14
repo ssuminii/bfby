@@ -9,6 +9,11 @@
  *   cards   위에서부터 순서대로 렌더된다
  */
 
+export const PRODUCT = {
+  name: "갤럭시 탭 S9 울트라 256GB 14 6인치 Wi-Fi",
+  price: 219000,
+};
+
 export const REPORT_MOCK = {
   //추천
   recommend: {

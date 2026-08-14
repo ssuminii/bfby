@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Onboarding from './pages/Onboarding'
 import Consult from './pages/Consult'
 import Report from './pages/Report'
+import ReasonSurvey from './pages/ReasonSurvey'
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
               <Route path="/" element={<Onboarding />} />
               <Route path="/consult" element={<Consult />} />
               <Route path="/report" element={<Report />} />
+              <Route path="/report/reason/:choice" element={<ReasonSurvey />} />
             </Routes>
           </div>
         </div>
