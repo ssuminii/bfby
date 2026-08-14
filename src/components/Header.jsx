@@ -27,9 +27,11 @@ export default function Header({ title }) {
           />
         </svg>
       </button>
-      <h1 className="text-title font-bold text-gray-800 leading-[1.5] tracking-tight-2">
-        {title}
-      </h1>
+      {title && (
+        <h1 className="text-title font-bold text-gray-800 leading-[1.5] tracking-tight-2">
+          {title}
+        </h1>
+      )}
     </header>
   );
 }
