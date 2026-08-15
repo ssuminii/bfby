@@ -3,7 +3,6 @@ import Button from '../Button'
 import { generateFirstQuestion, generateNextQuestion, generateJudgment } from '../../utils/gemini'
 
 const AXES = ['이미 있나', '얼마나 쓸까', '왜 하필 지금', '예산이 감당되는가']
-const getAxes = (category) => (category === '식품' ? [0, 2] : [0, 1, 2, 3])
 
 export default function QuestionSurvey({ productInfo, onDone }) {
   const [questions, setQuestions] = useState([])
@@ -16,7 +15,7 @@ export default function QuestionSurvey({ productInfo, onDone }) {
   const [phase, setPhase] = useState('idle') // idle | loading | done
   const judgmentRef = useRef(null)
 
-  const axes = category ? getAxes(category) : [0, 1, 2, 3]
+  const axes = [0, 1, 2, 3]
   const totalQuestions = axes.length
   const currentAxisIndex = axes[currentIndex]
   const isQ3 = currentAxisIndex === 2
