@@ -95,15 +95,6 @@ export default function QuestionSurvey({ productInfo, onDone }) {
             Q{currentIndex + 1}. {question.question}
           </p>
 
-          {question.infoLine && (
-            <p
-              className='mt-2 text-blue-500 font-medium'
-              style={{ fontSize: '13px', letterSpacing: '-0.13px', lineHeight: 1.5 }}
-            >
-              {question.infoLine}
-            </p>
-          )}
-
           <div className='mt-[24px] flex flex-col gap-[14px]'>
             {question.options.map((option, i) => {
               const isSelected = selected === i
