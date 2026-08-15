@@ -16,7 +16,6 @@ export default function Onboarding() {
     else if (step === 'intro') setStep('category')
     else if (step === 'category') setStep('link')
     else if (step === 'link') setStep('confirm')
-    else navigate('/consult')
   }
 
   return (
@@ -33,7 +32,11 @@ export default function Onboarding() {
         />
       )}
       {step === 'confirm' && (
-        <ProductConfirm link={link} onNext={next} onBack={() => setStep('link')} />
+        <ProductConfirm
+          link={link}
+          onNext={(product) => navigate('/consult', { state: { product } })}
+          onBack={() => setStep('link')}
+        />
       )}
     </div>
   )

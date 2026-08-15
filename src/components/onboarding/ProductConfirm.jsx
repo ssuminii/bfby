@@ -34,7 +34,7 @@ export default function ProductConfirm({ link, onNext, onBack }) {
   useEffect(() => {
     if (phase === 'idle') return
     const timer = setTimeout(
-      () => (phase === 'loading' ? setPhase('done') : onNext()),
+      () => (phase === 'loading' ? setPhase('done') : onNext(product)),
       phase === 'loading' ? 2200 : 2000,
     )
     return () => clearTimeout(timer)
