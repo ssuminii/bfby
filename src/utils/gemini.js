@@ -7,7 +7,7 @@ const CATEGORIES = ['의류', '뷰티', '전자기기', '생활용품', '식품'
 
 const generate = async (prompt) => {
   const response = await ai.models.generateContent({
-    model: 'gemini-3-flash-preview',
+    model: 'gemini-3.5-flash-lite',
     contents: prompt,
     config: { responseMimeType: 'application/json' },
   })
