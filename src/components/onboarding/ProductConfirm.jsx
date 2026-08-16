@@ -2,30 +2,55 @@ import { useEffect, useState } from 'react'
 import Button from '../Button'
 import fetchProductInfo from '../../utils/fetchProductInfo'
 
-const MOCK_PRODUCT = {
-  image: null,
-  name: '갤럭시 탭 S9 울트라 256GB 14 6인치 Wi-Fi 6E 안드로이드 태블릿 – 베이지 갱신',
-  price: 219000,
-  tags: ['특징태그', '특징태그', '특징태그'],
+function ProductSkeleton() {
+  return (
+    <div role='status' aria-label='상품 정보를 불러오는 중' className='animate-pulse'>
+      <div className='h-[210px] rounded-[24px] bg-gray-100' />
+      <div className='mt-5 h-6 w-full rounded-md bg-gray-100' />
+      <div className='mt-2 h-6 w-3/4 rounded-md bg-gray-100' />
+      <div className='mt-4 h-7 w-1/3 rounded-md bg-gray-100' />
+      <div className='mt-4 flex gap-2'>
+        <div className='h-[30px] w-20 rounded-full bg-gray-100' />
+        <div className='h-[30px] w-24 rounded-full bg-gray-100' />
+        <div className='h-[30px] w-16 rounded-full bg-gray-100' />
+      </div>
+      <span className='sr-only'>상품 정보를 불러오고 있어요.</span>
+    </div>
+  )
 }
 
 export default function ProductConfirm({ link, onNext, onBack }) {
-  const [product, setProduct] = useState(MOCK_PRODUCT)
+  const [product, setProduct] = useState(null)
+  const [fetchStatus, setFetchStatus] = useState(link ? 'loading' : 'error')
   const [phase, setPhase] = useState('idle') // idle | loading | done
 
-  // 링크에서 상품 정보 조회 — 실패하면 목데이터 유지
+  // 링크에서 상품 정보 조회
   useEffect(() => {
-    if (!link) return
+    if (!link) {
+      setFetchStatus('error')
+      return
+    }
+
     let alive = true
+    setProduct(null)
+    setFetchStatus('loading')
+
     fetchProductInfo(link).then((info) => {
-      if (!alive || !info) return
-      setProduct((prev) => ({
-        ...prev,
-        name: info.name ?? prev.name,
-        image: info.image ?? prev.image,
-        price: info.price ?? prev.price,
-      }))
+      if (!alive) return
+      if (!info) {
+        setFetchStatus('error')
+        return
+      }
+
+      setProduct({
+        name: info.name ?? '상품명 정보 없음',
+        image: info.image ?? null,
+        price: info.price ?? null,
+        tags: info.tags ?? [],
+      })
+      setFetchStatus('ready')
     })
+
     return () => {
       alive = false
     }
@@ -38,7 +63,7 @@ export default function ProductConfirm({ link, onNext, onBack }) {
       phase === 'loading' ? 2200 : 2000,
     )
     return () => clearTimeout(timer)
-  }, [phase, onNext])
+  }, [phase, onNext, product])
 
   return (
     <div className='relative flex flex-col h-full bg-white'>
@@ -47,51 +72,78 @@ export default function ProductConfirm({ link, onNext, onBack }) {
           className='text-title font-bold text-gray-800 text-center whitespace-nowrap'
           style={{ letterSpacing: '-0.4px', lineHeight: 1.5 }}
         >
-          사고 싶은 상품이 이 상품이 맞나요?
+          {fetchStatus === 'loading'
+            ? '상품 정보를 불러오고 있어요'
+            : fetchStatus === 'error'
+              ? '상품 정보를 불러오지 못했어요'
+              : '사고 싶은 상품이 이 상품이 맞나요?'}
         </p>
       </div>
 
-      <div className='flex-1 min-h-0 flex flex-col bg-gray-50 rounded-tl-[50px] rounded-tr-[50px] drop-shadow-[0px_0px_3px_rgba(0,0,0,0.12)] px-6 pt-6 pb-[42px]'>
-        <div className='h-[210px] shrink-0 flex items-center justify-center bg-white rounded-[24px] overflow-hidden'>
-          {product.image && (
-            <img src={product.image} alt='' className='max-w-full max-h-full object-contain' />
-          )}
-        </div>
+      <div
+        className='flex-1 min-h-0 flex flex-col bg-gray-50 rounded-tl-[50px] rounded-tr-[50px] drop-shadow-[0px_0px_3px_rgba(0,0,0,0.12)] px-6 pt-6 pb-[42px]'
+        aria-busy={fetchStatus === 'loading'}
+      >
+        {fetchStatus === 'loading' && <ProductSkeleton />}
 
-        <p
-          className='mt-5 text-body1 font-medium text-gray-800'
-          style={{ letterSpacing: '-0.16px', lineHeight: 1.5 }}
-        >
-          {product.name}
-        </p>
+        {fetchStatus === 'error' && (
+          <div className='flex flex-1 flex-col items-center justify-center text-center'>
+            <p className='text-body1 font-bold text-gray-800'>링크에서 상품 정보를 찾지 못했어요.</p>
+            <p className='mt-2 text-body2 font-medium text-gray-600'>다른 상품 링크로 다시 시도해 주세요.</p>
+            <Button onClick={onBack} variant='dark' className='mt-8'>
+              링크 다시 입력하기
+            </Button>
+          </div>
+        )}
 
-        <p
-          className='mt-3 text-price font-bold text-gray-800'
-          style={{ letterSpacing: '-0.22px', lineHeight: 1.5 }}
-        >
-          {product.price.toLocaleString()}원
-        </p>
+        {fetchStatus === 'ready' && product && (
+          <>
+            <div className='h-[210px] shrink-0 flex items-center justify-center bg-white rounded-[24px] overflow-hidden'>
+              {product.image && (
+                <img src={product.image} alt='' className='max-w-full max-h-full object-contain' />
+              )}
+            </div>
 
-        <div className='mt-4 flex flex-wrap gap-2'>
-          {product.tags.map((tag, i) => (
-            <span
-              key={i}
-              className='flex items-center h-[30px] px-4 rounded-full bg-white border border-gray-100 text-gray-500 font-medium'
-              style={{ fontSize: '12px', letterSpacing: '-0.12px' }}
+            <p
+              className='mt-5 text-body1 font-medium text-gray-800'
+              style={{ letterSpacing: '-0.16px', lineHeight: 1.5 }}
             >
-              {tag}
-            </span>
-          ))}
-        </div>
+              {product.name}
+            </p>
 
-        <div className='mt-auto pt-4 flex flex-col gap-3'>
-          <Button onClick={() => setPhase('loading')} variant='dark'>
-            맞아요, 시작하기
-          </Button>
-          <Button onClick={onBack} variant='secondary'>
-            이 링크가 아니에요
-          </Button>
-        </div>
+            {product.price !== null && (
+              <p
+                className='mt-3 text-price font-bold text-gray-800'
+                style={{ letterSpacing: '-0.22px', lineHeight: 1.5 }}
+              >
+                {product.price.toLocaleString()}원
+              </p>
+            )}
+
+            {product.tags.length > 0 && (
+              <div className='mt-4 flex flex-wrap gap-2'>
+                {product.tags.map((tag, i) => (
+                  <span
+                    key={i}
+                    className='flex items-center h-[30px] px-4 rounded-full bg-white border border-gray-100 text-gray-500 font-medium'
+                    style={{ fontSize: '12px', letterSpacing: '-0.12px' }}
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            <div className='mt-auto pt-4 flex flex-col gap-3'>
+              <Button onClick={() => setPhase('loading')} variant='dark'>
+                맞아요, 시작하기
+              </Button>
+              <Button onClick={onBack} variant='secondary'>
+                이 링크가 아니에요
+              </Button>
+            </div>
+          </>
+        )}
       </div>
 
       {phase !== 'idle' && (
