@@ -32,9 +32,12 @@ export default function QuestionSurvey({ productInfo, onDone }) {
 
   useEffect(() => {
     if (phase !== 'done') return
-    const timer = setTimeout(() => onDone({ answers, judgment: judgmentRef.current }), 2000)
+    const timer = setTimeout(
+      () => onDone({ answers, judgment: judgmentRef.current, category }),
+      2000,
+    )
     return () => clearTimeout(timer)
-  }, [phase, onDone, answers])
+  }, [phase, onDone, answers, category])
 
   const next = async () => {
     const answer = selected !== null ? question.options[selected] : extraText.trim()
