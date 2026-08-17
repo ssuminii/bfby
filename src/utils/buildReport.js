@@ -10,6 +10,7 @@
  */
 
 import { scaleOf } from '../constants/savingScale.js'
+import { isSaving } from './history.js'
 
 // AI는 축별 좋음/주의/걸림만 판단하고, 최종 판정은 여기서 계산한다.
 // 축마다 무게가 달라서 걸림 개수만 세면 안 된다.
@@ -96,7 +97,7 @@ const sameMonth = (iso, now) => {
 
 // "지금 안 사면 이렇게 된다"를 보여주는 카드라 before 〉 after 형태로 쓴다.
 function savingCard(price, history, now = new Date()) {
-  const skipped = history.filter((h) => h.choice === 'skip')
+  const skipped = history.filter(isSaving)
   const total = skipped.reduce((sum, h) => sum + (h.price ?? 0), 0)
   const month = skipped
     .filter((h) => h.at && sameMonth(h.at, now))
@@ -119,46 +120,46 @@ function savingCard(price, history, now = new Date()) {
   }
 }
 
-// 저장된 건 리포트 화면에서 누른 버튼뿐이다. 실제로 샀는지는 알 수 없으므로
-// "구매하셨어요"처럼 행동을 단정하지 말고 그때의 선택으로만 말한다.
-const CHOICE_LABEL = {
-  skip: '안 사기로 하셨어요',
-  buy: '사기로 하셨어요',
-  hold: '더 고민해보기로 하셨어요',
-}
+// 체크인 만족 비율로 이 카테고리의 판단 성향을 한 줄로 말해준다
+const CHECKIN_VERDICT = [
+  { min: 0.7, line: '이 카테고리는 판단이 잘 맞는 편이에요.' },
+  { min: 0.4, line: '이 카테고리는 만족과 아쉬움이 반반이었어요.' },
+  { min: 0, line: '이 카테고리는 사고 나서 아쉬우셨던 적이 많았어요.' },
+]
 
-// 지나간 결정만으로 쓴다. 없는 이력을 지어내지 않으려고 AI를 거치지 않는다.
-function historyCard(history, category, signals) {
+// 지나간 기록만으로 쓴다. 없는 이력을 지어내지 않으려고 AI를 거치지 않는다.
+function historyCard(history, category) {
   const past = category ? history.filter((h) => h.category === category) : []
+  const count = past.length + 1 // 지금 보고 계신 이번 판단까지 포함
+  const lead = category ? `${category} 카테고리에서` : '지금까지'
 
-  // 비교할 기록이 아직 없으면 이번 답변을 정리해준다
-  if (!past.length) {
-    const answers = signals.map((s) => s.answer).filter(Boolean)
+  // 체크인은 결정하고 한참 뒤에 답하는 거라 아직 없을 수 있다
+  const checked = past.filter((h) => h.checkin)
+
+  if (!checked.length) {
     return {
       title: '내 기록',
       lines: [
-        answers.length ? `이번에는 이렇게 답하셨어요.\n${answers.join(' · ')}` : null,
-        '다음에 비슷한 걸 고민하실 때 오늘의 선택을 함께 보여드릴게요.',
-      ].filter(Boolean),
+        `${lead} 지금까지 ${count}번 판단하셨어요.`,
+        '살지 말지 정하고 나면 얼마 뒤에 그 물건이 어땠는지 여쭤볼게요.\n답이 쌓이면 이 카테고리에서 어떤 선택이 잘 맞았는지 알려드릴 수 있어요.',
+      ],
     }
   }
 
-  // 0번짜리 문구가 나오지 않게 실제로 있었던 선택만 센다
-  const made = Object.entries(CHOICE_LABEL)
-    .map(([choice, label]) => [past.filter((h) => h.choice === choice).length, label])
-    .filter(([count]) => count)
-    .map(([count, label]) => `${count}번은 ${label}`)
-
-  const saved = past
-    .filter((h) => h.choice === 'skip')
-    .reduce((sum, h) => sum + (h.price ?? 0), 0)
+  const good = checked.filter((h) => h.checkin === 'satisfied').length
+  const howMany =
+    good === checked.length
+      ? `${checked.length}번 모두 '만족스러워요'`
+      : good === 0
+        ? `${checked.length}번 모두 '아쉬워요'`
+        : `${checked.length}번 중 ${good}번은 '만족스러워요'`
 
   return {
     title: '내 기록',
     lines: [
-      `${category} 카테고리는 지금까지 ${past.length}번 고민하셨어요.\n그중 ${made.join(', ')}.`,
-      saved ? `안 사기로 하신 금액을 모두 더하면 ${saved.toLocaleString()}원이에요.` : null,
-    ].filter(Boolean),
+      `${lead} 지금까지 ${count}번 판단하셨고,\n체크인에서 ${howMany}라고 답하셨어요.`,
+      CHECKIN_VERDICT.find((v) => good / checked.length >= v.min).line,
+    ],
     tag: '내 기록 기반',
   }
 }
@@ -171,7 +172,7 @@ export function buildReport(judgment, product, history = [], category = null) {
   const cards = [
     reasonCard(type, signals, judgment.reasons),
     judgment.usage && usageCard(judgment.usage, price),
-    historyCard(history, category, signals),
+    historyCard(history, category),
     judgment.tryFirst && tryFirstCard(judgment.tryFirst),
     type !== 'recommend' && price ? savingCard(price, history) : null,
   ].filter(Boolean)
