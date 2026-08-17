@@ -127,40 +127,81 @@ const CHECKIN_VERDICT = [
   { min: 0, line: '이 카테고리는 사고 나서 아쉬우셨던 적이 많았어요.' },
 ]
 
+// 리포트 화면에서 누른 버튼이다. 실제로 샀는지는 체크인 전까지 알 수 없다.
+const CHOICE_LABEL = {
+  skip: '안 사기로',
+  buy: '사기로',
+  hold: '더 고민해보기로',
+}
+
+// 0번짜리 문구가 나오지 않게 실제로 있었던 선택만 센다
+function pastChoices(past) {
+  const made = Object.entries(CHOICE_LABEL)
+    .map(([choice, label]) => [past.filter((h) => h.choice === choice).length, label])
+    .filter(([n]) => n)
+
+  if (made.length === 1) {
+    const [, label] = made[0]
+    return past.length === 1
+      ? `지난 1번은 ${label} 하셨어요.`
+      : `지난 ${past.length}번은 모두 ${label} 하셨어요.`
+  }
+
+  const parts = made.map(([n, label]) => `${n}번은 ${label}`).join(', ')
+  return `지난 ${past.length}번 중 ${parts} 하셨어요.`
+}
+
+// 체크인은 '더 고민할게요'로 미뤄둔 건에만 붙는다.
+// 안 사기로·사기로 한 건 그 자리에서 결정이 끝나서 다시 묻지 않는다.
+function checkinLines(past) {
+  const resolved = past.filter((h) => h.choice === 'hold' && h.checkin)
+  if (!resolved.length) return []
+
+  const bought = resolved.filter((h) => h.checkin.resolved === 'buy')
+
+  if (!bought.length) {
+    return [`고민하셨던 ${resolved.length}번은 결국 사지 않으셨어요.`]
+  }
+
+  const good = bought.filter((h) => h.checkin.satisfied).length
+  const how =
+    good === bought.length
+      ? `${bought.length}번 모두 '만족스러워요'`
+      : good === 0
+        ? `${bought.length}번 모두 '아쉬워요'`
+        : `${bought.length}번 중 ${good}번은 '만족스러워요'`
+
+  const head =
+    bought.length === resolved.length
+      ? `고민하셨던 ${resolved.length}번은 결국 다 사셨어요.`
+      : `고민하셨던 ${resolved.length}번 중 ${bought.length}번은 결국 사셨어요.`
+
+  return [
+    `${head}\n${how}라고 답하셨어요.`,
+    CHECKIN_VERDICT.find((v) => good / bought.length >= v.min).line,
+  ]
+}
+
 // 지나간 기록만으로 쓴다. 없는 이력을 지어내지 않으려고 AI를 거치지 않는다.
 function historyCard(history, category) {
   const past = category ? history.filter((h) => h.category === category) : []
   const count = past.length + 1 // 지금 보고 계신 이번 판단까지 포함
   const lead = category ? `${category} 카테고리에서` : '지금까지'
-
-  // 체크인은 결정하고 한참 뒤에 답하는 거라 아직 없을 수 있다
-  const checked = past.filter((h) => h.checkin)
-
-  if (!checked.length) {
-    return {
-      title: '내 기록',
-      lines: [
-        `${lead} 지금까지 ${count}번 판단하셨어요.`,
-        '살지 말지 정하고 나면 얼마 뒤에 그 물건이 어땠는지 여쭤볼게요.\n답이 쌓이면 이 카테고리에서 어떤 선택이 잘 맞았는지 알려드릴 수 있어요.',
-      ],
-    }
-  }
-
-  const good = checked.filter((h) => h.checkin === 'satisfied').length
-  const howMany =
-    good === checked.length
-      ? `${checked.length}번 모두 '만족스러워요'`
-      : good === 0
-        ? `${checked.length}번 모두 '아쉬워요'`
-        : `${checked.length}번 중 ${good}번은 '만족스러워요'`
+  const checkin = checkinLines(past)
 
   return {
     title: '내 기록',
     lines: [
-      `${lead} 지금까지 ${count}번 판단하셨고,\n체크인에서 ${howMany}라고 답하셨어요.`,
-      CHECKIN_VERDICT.find((v) => good / checked.length >= v.min).line,
+      [`${lead} 지금까지 ${count}번 판단하셨어요.`, past.length && pastChoices(past)]
+        .filter(Boolean)
+        .join('\n'),
+      ...(checkin.length
+        ? checkin
+        : [
+            '더 고민할게요를 고르시면 얼마 뒤에 그 물건을 어떻게 하셨는지 여쭤볼게요.\n답이 쌓이면 이 카테고리에서 어떤 선택이 잘 맞았는지 알려드릴 수 있어요.',
+          ]),
     ],
-    tag: '내 기록 기반',
+    ...(past.length && { tag: '내 기록 기반' }),
   }
 }
 
