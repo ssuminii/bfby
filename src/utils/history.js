@@ -23,8 +23,13 @@ const KEY = 'bfby.decisions'
  * 추천을 받고도 안 산 건 아낀 돈이 아니라 필요한 소비를 미룬 것에 가깝다.
  * 보류·비추천에서 안 사기로 한 것만 절약으로 본다.
  */
+// 그 자리에서 안 사기로 했든, 고민하다 결국 안 샀든 결과는 같다.
+// checkin은 choice가 'hold'인 기록에만 붙으므로 choice를 따로 볼 필요가 없다.
+const endedUpNotBuying = (record) =>
+  record.choice === 'skip' || record.checkin?.resolved === 'skip'
+
 export const isSaving = (record) =>
-  record.choice === 'skip' && record.type !== 'recommend'
+  endedUpNotBuying(record) && record.type !== 'recommend'
 
 export const totalSaved = (history) =>
   history.filter(isSaving).reduce((sum, h) => sum + (h.price ?? 0), 0)
