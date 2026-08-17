@@ -2,9 +2,15 @@
  * 판단 기록을 localStorage에 쌓는다.
  * 저장하는 건 결정 그 자체뿐이고, 리포트 내용은 저장하지 않는다.
  *
- *   { name, price, category, type, choice, at }
+ *   { name, price, category, type, choice, at, checkin? }
  *   choice  'buy' | 'skip' | 'hold'
  *   type    리포트 판정 ('recommend' | 'hold' | 'avoid')
+ *
+ * checkin은 choice가 'hold'인 기록에만 붙는다.
+ * 안 사기로·사기로 한 건 그 자리에서 결정이 끝나서 다시 묻지 않는다.
+ *
+ *   { resolved: 'skip' }                        고민하다 결국 안 삼
+ *   { resolved: 'buy', satisfied: true|false }  결국 샀고, 써보니 어땠는지
  *
  * ponytail: localStorage라 기기별로 따로 쌓인다. 계정이 생기면 서버로 옮긴다.
  */
