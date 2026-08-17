@@ -1,8 +1,9 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import Onboarding from './pages/Onboarding'
-import Consult from './pages/Consult'
-import Report from './pages/Report'
-import ReasonSurvey from './pages/ReasonSurvey'
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Onboarding from "./pages/Onboarding";
+import Consult from "./pages/Consult";
+import Report from "./pages/Report";
+import ReasonSurvey from "./pages/ReasonSurvey";
+import MyReports from "./pages/MyReports";
 
 function App() {
   return (
@@ -15,12 +16,13 @@ function App() {
               <Route path="/consult" element={<Consult />} />
               <Route path="/report" element={<Report />} />
               <Route path="/report/reason/:choice" element={<ReasonSurvey />} />
+              <Route path="/reports" element={<MyReports />} />
             </Routes>
           </div>
         </div>
       </div>
     </BrowserRouter>
-  )
+  );
 }
 
-export default App
+export default App;
