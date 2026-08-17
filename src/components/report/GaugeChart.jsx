@@ -9,12 +9,13 @@ const CY = 99;
 const OUTER = 96;
 const INNER = 42;
 const CORNER = 3;
-const GAP = 1.5;
+// 세그먼트는 서로 붙어 있다. 사이의 경계선은 모서리 라운딩(CORNER)이 만든다
+const GAP = 0;
 const DEPTH = 4;
 const NEEDLE_LENGTH = 60;
 const NEEDLE_HALF = 11;
-const HUB_OUTER = 22;
-const HUB_INNER = 14;
+const HUB_OUTER = 24;
+const HUB_INNER = 17;
 
 const lighten = (color, amount) =>
   `color-mix(in srgb, ${color} ${100 - amount}%, white)`;
@@ -60,22 +61,6 @@ export default function GaugeChart({ value = 0, className = "" }) {
       aria-label={`게이지 ${score}점`}
     >
       <defs>
-        {arcs.map(({ id, color }) => (
-          <linearGradient
-            key={id}
-            id={`gauge-face-${id}`}
-            gradientUnits="userSpaceOnUse"
-            x1={0}
-            y1={CY - OUTER}
-            x2={0}
-            y2={CY}
-          >
-            <stop offset="0%" stopColor={lighten(color, 22)} />
-            <stop offset="55%" stopColor={color} />
-            <stop offset="100%" stopColor={darken(color, 10)} />
-          </linearGradient>
-        ))}
-
         <linearGradient
           id="gauge-needle"
           gradientUnits="userSpaceOnUse"
@@ -91,14 +76,18 @@ export default function GaugeChart({ value = 0, className = "" }) {
           />
         </linearGradient>
 
-        <radialGradient id="gauge-hub" cx="38%" cy="32%" r="78%">
-          <stop offset="0%" stopColor={lighten("var(--color-blue-500)", 30)} />
-          <stop offset="100%" stopColor={darken("var(--color-blue-500)", 18)} />
+        {/* 빛은 오른쪽에서 든다. 링은 오른쪽이 밝고 왼쪽이 어둡다 */}
+        <radialGradient id="gauge-hub" cx="75%" cy="45%" r="80%">
+          <stop offset="0%" stopColor="#6ab5fd" />
+          <stop offset="100%" stopColor="#2e5099" />
         </radialGradient>
 
-        <radialGradient id="gauge-hub-inner" cx="38%" cy="32%" r="80%">
-          <stop offset="0%" stopColor="white" />
-          <stop offset="100%" stopColor="var(--color-gray-100)" />
+        {/* 안쪽 원은 파여 있어서 링 그림자가 오른쪽에 진다 (링과 반대 방향).
+            대부분은 밝고 오른쪽 테두리에서만 어두워진다 */}
+        <radialGradient id="gauge-hub-inner" cx="28%" cy="45%" r="88%">
+          <stop offset="0%" stopColor="#f4f4f4" />
+          <stop offset="55%" stopColor="#ebeae9" />
+          <stop offset="100%" stopColor="#c2c0be" />
         </radialGradient>
       </defs>
 
@@ -115,12 +104,13 @@ export default function GaugeChart({ value = 0, className = "" }) {
         />
       ))}
 
-      {arcs.map(({ id, d }) => (
+      {/* 윗면은 그라데이션 없이 단색이다 */}
+      {arcs.map(({ id, color, d }) => (
         <path
           key={`face-${id}`}
           d={d}
-          fill={`url(#gauge-face-${id})`}
-          stroke={`url(#gauge-face-${id})`}
+          fill={color}
+          stroke={color}
           strokeWidth={CORNER * 2}
           strokeLinejoin="round"
         />
