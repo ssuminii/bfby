@@ -6,6 +6,7 @@ import OtherInput from "../components/reason/OtherInput";
 import ProductSummary from "../components/reason/ProductSummary";
 import ReasonOptions from "../components/reason/ReasonOptions";
 import { REASON_SURVEY } from "../constants/reasonSurvey";
+import { saveDecision } from "../utils/history";
 
 export default function ReasonSurvey() {
   const navigate = useNavigate();
@@ -27,9 +28,18 @@ export default function ReasonSurvey() {
     if (text) setSelected(null);
   };
 
+  // 완료를 눌러야 비로소 결정으로 집계된다. 버튼을 누른 것만으로는 기록하지 않는다.
   const submit = () => {
+    saveDecision({
+      name: product?.name,
+      price: product?.price ?? 0,
+      category: state?.category,
+      type: state?.type,
+      choice,
+      reason: answer,
+    });
     // TODO: answer 를 서버로 보내고 이동할 화면 결정 (미정)
-    navigate(-1);
+    navigate("/reports");
   };
 
   if (!survey) return null;

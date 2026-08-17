@@ -16,7 +16,17 @@ export default function ReportActions({
   const navigate = useNavigate();
 
   const handle = (key) => {
-    // 버튼을 누른 순간이 결정이다. 이유 설문에서 뒤로 가도 결정은 남는다.
+    // 안 살래요·더 고민할게요는 이유 설문까지 마쳐야 결정으로 친다.
+    // 중간에 뒤로 가면 기록에 남지 않아야 집계가 부풀지 않는다.
+    if (REASON_SURVEY[key]) {
+      navigate(`/report/reason/${key}`, {
+        state: { product, category, type, choice: key },
+      });
+      return;
+    }
+
+    // 살래요는 물어볼 이유가 없으니 누른 순간이 결정
+    // 추천 리포트에서 누른 것만 좋은 소비가 된다 (utils/history.js의 isGoodSpending).
     saveDecision({
       name: product?.name,
       price: product?.price ?? 0,
@@ -24,10 +34,7 @@ export default function ReportActions({
       type,
       choice: key,
     });
-
-    if (REASON_SURVEY[key])
-      navigate(`/report/reason/${key}`, { state: { product } });
-    // TODO: 살래요 선택 후 이동할 화면 (미정)
+    navigate("/reports");
   };
 
   return (
