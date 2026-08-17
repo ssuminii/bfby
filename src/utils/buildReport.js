@@ -214,7 +214,8 @@ export function buildReport(judgment, product, history = [], category = null) {
     reasonCard(type, signals, judgment.reasons),
     judgment.usage && usageCard(judgment.usage, price),
     historyCard(history, category),
-    judgment.tryFirst && tryFirstCard(judgment.tryFirst),
+    // 살 만하다고 판단했으면 굳이 대여를 권하지 않는다
+    type !== 'recommend' && judgment.tryFirst ? tryFirstCard(judgment.tryFirst) : null,
     type !== 'recommend' && price ? savingCard(price, history) : null,
   ].filter(Boolean)
 
