@@ -1,8 +1,8 @@
-export default function Card({ children, gap = 'gap-4', className = '' }) {
+export default function Card({ children, className = '', ...props }) {
   return (
     <div
-      className={`w-full flex flex-col justify-center items-start px-4 py-6
-        rounded-[12px] bg-white shadow-[0_0_6px_0_rgba(0,0,0,0.08)] ${gap} ${className}`}
+      className={`rounded-[24px] drop-shadow-[0px_0px_3px_rgba(0,0,0,0.12)] ${className}`}
+      {...props}
     >
       {children}
     </div>
