@@ -197,3 +197,51 @@ body {
     font-family: inherit;
   }
 }
+
+/* 습득한 카드가 보관함 목록으로 들어가는 전환.
+   위치와 크기는 브라우저가 보간해주고, Y축 회전만 얹는다.
+   old와 new가 같은 각도로 함께 돌면서 교차되어 카드 한 장이 도는 것처럼 보인다. */
+@keyframes card-flip-out {
+  from {
+    transform: perspective(1200px) rotateY(0deg);
+    opacity: 1;
+  }
+  to {
+    transform: perspective(1200px) rotateY(720deg);
+    opacity: 0;
+  }
+}
+
+@keyframes card-flip-in {
+  from {
+    transform: perspective(1200px) rotateY(0deg);
+    opacity: 0;
+  }
+  to {
+    transform: perspective(1200px) rotateY(720deg);
+    opacity: 1;
+  }
+}
+
+::view-transition-group(acquired-card) {
+  animation-duration: 900ms;
+  animation-timing-function: cubic-bezier(0.2, 0, 0.1, 1);
+}
+
+::view-transition-old(acquired-card) {
+  /* 기본 교차 페이드는 plus-lighter라 겹치는 동안 색이 뜬다 */
+  mix-blend-mode: normal;
+  animation: card-flip-out 900ms cubic-bezier(0.2, 0, 0.1, 1) both;
+}
+
+::view-transition-new(acquired-card) {
+  mix-blend-mode: normal;
+  animation: card-flip-in 900ms cubic-bezier(0.2, 0, 0.1, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(acquired-card),
+  ::view-transition-new(acquired-card) {
+    animation: none;
+  }
+}

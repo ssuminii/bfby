@@ -5,6 +5,7 @@ import SpendingCard from "../components/reports/SpendingCard";
 import linkIcon from "../assets/icons/link.svg";
 import { tierOf } from "../constants/cardTier";
 import { cardKindOf } from "../utils/history";
+import { withViewTransition } from "../utils/viewTransition";
 
 const COPY = {
   good: { title: "합리적인 소비 카드를\n습득했어요!", showLink: true },
@@ -58,7 +59,6 @@ export default function CardAcquired() {
   const record = state?.record ?? null;
   const kind = record && cardKindOf(record);
 
-  // 얻는 카드가 없는 결정이거나 기록 없이 들어온 경우 보여줄 게 없다
   if (!kind) return <Navigate to="/reports" replace />;
 
   const copy = COPY[kind];
@@ -80,7 +80,11 @@ export default function CardAcquired() {
           {copy.title}
         </p>
 
-        <SpendingCard record={record} size="lg" />
+        <SpendingCard
+          record={record}
+          size="lg"
+          transitionName="acquired-card"
+        />
 
         {state?.note && (
           <p className="whitespace-pre-line text-center text-bodyb text-gray-600">
@@ -92,7 +96,14 @@ export default function CardAcquired() {
       <div className="absolute bottom-10 left-1/2 flex w-[345px] -translate-x-1/2 flex-col gap-3">
         {copy.showLink && link && <CopyLinkButton link={link} />}
 
-        <Button variant="dark" onClick={() => navigate("/reports")}>
+        <Button
+          variant="dark"
+          onClick={() =>
+            withViewTransition(() =>
+              navigate("/reports", { state: { justAdded: record.at } }),
+            )
+          }
+        >
           카드 보관함으로 이동
         </Button>
 

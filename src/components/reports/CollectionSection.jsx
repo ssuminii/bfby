@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import Button from "../Button";
 import ConsumptionToggle from "./ConsumptionToggle";
 import PendingCard from "./PendingCard";
@@ -6,10 +6,20 @@ import SpendingCard from "./SpendingCard";
 
 const PREVIEW_SIZE = 6;
 
-export default function CollectionSection({ collections, pending }) {
-  const [mode, setMode] = useState("good");
+export default function CollectionSection({ collections, pending, justAdded }) {
+  // 절약 카드를 담고 왔으면 그 탭이 열려 있어야 카드가 안착할 자리가 보인다
+  const [mode, setMode] = useState(() =>
+    justAdded && !collections.good.some((record) => record.at === justAdded)
+      ? "saving"
+      : "good",
+  );
   const [expanded, setExpanded] = useState(false);
   const records = collections[mode];
+  const landingRef = useRef(null);
+
+  useLayoutEffect(() => {
+    landingRef.current?.scrollIntoView({ block: "center" });
+  }, [justAdded]);
 
   // 가진 카드를 먼저 채우고, 모자란 만큼만 빈 자리로 남긴다
   const cards = useMemo(() => {
@@ -41,12 +51,22 @@ export default function CollectionSection({ collections, pending }) {
       </div>
 
       <div className="mt-6 grid grid-cols-3 gap-x-4 gap-y-6">
-        {cards.map((record, index) => (
-          <SpendingCard
-            key={record?.at ? `${record.at}-${index}` : `placeholder-${index}`}
-            record={record}
-          />
-        ))}
+        {cards.map((record, index) => {
+          const landed = Boolean(justAdded) && record?.at === justAdded;
+          return (
+            <div
+              key={
+                record?.at ? `${record.at}-${index}` : `placeholder-${index}`
+              }
+              ref={landed ? landingRef : undefined}
+            >
+              <SpendingCard
+                record={record}
+                transitionName={landed ? "acquired-card" : undefined}
+              />
+            </div>
+          );
+        })}
       </div>
 
       <div className="mt-6">

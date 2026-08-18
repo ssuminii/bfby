@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useLocation } from "react-router-dom";
 import Header from "../components/Header";
 import NavBar from "../components/NavBar";
 import CollectionSection from "../components/reports/CollectionSection";
@@ -12,6 +13,7 @@ import {
 } from "../utils/reportHistory";
 
 export default function Reports() {
+  const { state } = useLocation();
   const [history] = useState(() => [...MOCK_HISTORY, ...loadHistory()]);
   const summary = useMemo(() => reportHistorySummary(history), [history]);
   const collections = useMemo(() => spendingCollections(history), [history]);
@@ -23,7 +25,11 @@ export default function Reports() {
       <main className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
         <SavingsOverview summary={summary} />
         <div className="mx-6 border-t border-gray-100" />
-        <CollectionSection collections={collections} pending={pending} />
+        <CollectionSection
+          collections={collections}
+          pending={pending}
+          justAdded={state?.justAdded}
+        />
       </main>
       <NavBar />
     </div>

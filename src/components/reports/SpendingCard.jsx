@@ -36,7 +36,7 @@ const SIZES = {
   },
 }
 
-export default function SpendingCard({ record, size = 'sm' }) {
+export default function SpendingCard({ record, size = 'sm', transitionName }) {
   const style = SIZES[size]
 
   // 아직 못 얻은 자리다. 가격 0짜리 카드로 그리면 등급까지 매겨져 실제 카드처럼 보인다.
@@ -54,6 +54,7 @@ export default function SpendingCard({ record, size = 'sm' }) {
   return (
     <article
       className={`flex flex-col overflow-hidden drop-shadow-[0_0_2px_rgba(0,0,0,0.12)] ${style.card}`}
+      style={transitionName ? { viewTransitionName: transitionName } : undefined}
     >
       <div
         className={`relative flex flex-1 items-center justify-center overflow-hidden ${tier.color}`}
