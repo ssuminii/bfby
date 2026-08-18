@@ -2,7 +2,7 @@
  * 판단 기록을 localStorage에 쌓는다.
  * 저장하는 건 결정 그 자체뿐이고, 리포트 내용은 저장하지 않는다.
  *
- *   { name, price, category, type, choice, at, checkin? }
+ *   { name, price, image?, category, type, choice, at, checkin? }
  *   choice  'buy' | 'skip' | 'hold'
  *   type    리포트 판정 ('recommend' | 'hold' | 'avoid')
  *
