@@ -1,17 +1,19 @@
 import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Button from "../components/Button";
 import Header from "../components/Header";
 import OtherInput from "../components/reason/OtherInput";
 import ProductSummary from "../components/reason/ProductSummary";
 import ReasonOptions from "../components/reason/ReasonOptions";
 import { REASON_SURVEY } from "../constants/reasonSurvey";
-import { PRODUCT } from "../mocks/report";
+import { saveDecision } from "../utils/history";
 
 export default function ReasonSurvey() {
   const navigate = useNavigate();
   const { choice } = useParams();
+  const { state } = useLocation();
   const survey = REASON_SURVEY[choice];
+  const product = state?.product;
 
   const [selected, setSelected] = useState(null);
   const [other, setOther] = useState("");
@@ -26,12 +28,23 @@ export default function ReasonSurvey() {
     if (text) setSelected(null);
   };
 
+  // 완료를 눌러야 비로소 결정으로 집계된다. 버튼을 누른 것만으로는 기록하지 않는다.
   const submit = () => {
+    saveDecision({
+      name: product?.name,
+      price: product?.price ?? 0,
+      category: state?.category,
+      type: state?.type,
+      choice,
+      reason: answer,
+    });
     // TODO: answer 를 서버로 보내고 이동할 화면 결정 (미정)
-    navigate(-1);
+    navigate("/reports");
   };
 
   if (!survey) return null;
+
+  const showProduct = survey.showProduct && product;
 
   return (
     <div className="flex flex-col h-full bg-white">
@@ -39,20 +52,20 @@ export default function ReasonSurvey() {
 
       <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
         <div className="min-h-full flex flex-col px-6 pb-[42px]">
-          {survey.showProduct && (
+          {showProduct && (
             <div className="mt-6">
-              <ProductSummary name={PRODUCT.name} price={PRODUCT.price} />
+              <ProductSummary name={product.name} price={product.price} />
             </div>
           )}
 
           <p
             className={`whitespace-pre-line text-title font-bold text-gray-800 leading-[1.5] tracking-tight-2
-              ${survey.showProduct ? "mt-6" : "mt-10"}`}
+              ${showProduct ? "mt-6" : "mt-10"}`}
           >
             {survey.question}
           </p>
 
-          <div className={survey.showProduct ? "mt-6" : "mt-12"}>
+          <div className={showProduct ? "mt-6" : "mt-12"}>
             <ReasonOptions selected={selected} onSelect={selectOption} />
             <div className="mt-3 flex flex-col">
               <OtherInput value={other} onChange={changeOther} />

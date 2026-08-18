@@ -8,7 +8,10 @@ import SoftTag from "./SoftTag";
 
 export default function ReportCard({ card }) {
   return (
-    <Card>
+    <Card
+      className="flex flex-col justify-center items-start self-stretch gap-4 px-4 py-6 bg-white"
+      style={{ borderRadius: "12px" }}
+    >
       <CardTitle>{card.title}</CardTitle>
       {card.items && <ReasonList items={card.items} />}
       {card.amount && <Amount value={card.amount} formula={card.formula} />}

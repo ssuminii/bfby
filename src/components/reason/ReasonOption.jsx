@@ -5,7 +5,7 @@ export default function ReasonOption({ label, selected, onSelect }) {
       onClick={onSelect}
       className={`flex items-center justify-between h-[50px] shrink-0 px-4 rounded-2xl
         border-2 transition-colors text-left
-        ${selected ? "bg-blue-50 border-blue-300" : "bg-[#fafafa] border-transparent"}`}
+        ${selected ? "bg-blue-50 border-blue-300" : "bg-gray-50 border-transparent"}`}
     >
       <span
         className={`text-bodyb font-medium tracking-tight-1
@@ -15,7 +15,7 @@ export default function ReasonOption({ label, selected, onSelect }) {
       </span>
       <span
         className={`w-5 h-5 shrink-0 rounded-full bg-white border-[6px] transition-colors
-          ${selected ? "border-blue-500" : "border-gray-400"}`}
+          ${selected ? "border-[6px] border-blue-500" : "border-[6px] border-gray-400"}`}
       />
     </button>
   );

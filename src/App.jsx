@@ -1,12 +1,12 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import Onboarding from './pages/Onboarding'
-import Home from './pages/Home'
-import ConsultSetup from './pages/ConsultSetup'
-import Reports from './pages/Reports'
-import BuyOrNot from './pages/BuyOrNot'
-import Consult from './pages/Consult'
-import Report from './pages/Report'
-import ReasonSurvey from './pages/ReasonSurvey'
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Onboarding from "./pages/Onboarding";
+import Home from "./pages/Home";
+import ConsultSetup from "./pages/ConsultSetup";
+import Reports from "./pages/Reports";
+import BuyOrNot from "./pages/BuyOrNot";
+import Consult from "./pages/Consult";
+import Report from "./pages/Report";
+import ReasonSurvey from "./pages/ReasonSurvey";
 
 function App() {
   return (
@@ -28,7 +28,7 @@ function App() {
         </div>
       </div>
     </BrowserRouter>
-  )
+  );
 }
 
-export default App
+export default App;

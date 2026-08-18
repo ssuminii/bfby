@@ -4,9 +4,7 @@ import Muted from "./Muted";
 export default function Amount({ value, formula }) {
   return (
     <div className="w-full flex flex-col gap-2">
-      <p className="text-[28px] font-bold text-gray-800 leading-[normal]">
-        {value}
-      </p>
+      <p className="text-display text-gray-800">{value}</p>
       {formula && <Muted>{formula}</Muted>}
     </div>
   );

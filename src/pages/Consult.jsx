@@ -10,7 +10,10 @@ export default function Consult() {
 
   const finishQuestions = (result) => {
     setAnswers(result.answers)
-    navigate('/report', { replace: true, state: { judgment: result.judgment, product: productInfo } })
+    navigate('/report', {
+      replace: true,
+      state: { judgment: result.judgment, product: productInfo, category: result.category },
+    })
   }
 
   return (
