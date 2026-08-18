@@ -35,6 +35,12 @@
   --color-report-gauge-caution: #deb040;
   --color-report-gauge-info: #558eea;
 
+  /* Report - collection */
+  --color-report-card-gold: #ffc144;
+  --color-report-card-bronze: #b79d8c;
+  --color-report-chart-track: #fbfcfd;
+  --color-report-pending-dark: #686d75;
+
   /* Hero gradient stops */
   --color-hero-start: #37b6ff;
   --color-hero-end: #2f6bff;
@@ -46,6 +52,24 @@
 /* Gradients */
 @utility bg-hero-gradient {
   background: linear-gradient(to bottom, #37b6ff, #2f6bff);
+}
+
+@utility bg-report-summary-gradient {
+  background: linear-gradient(to bottom, #ffffff 10%, #e9f2ff 50%, #ffffff 100%);
+}
+
+@utility bg-report-chart-gradient {
+  background: linear-gradient(to top, var(--color-blue-300), var(--color-blue-500));
+}
+
+@utility bg-report-pending-gradient {
+  background: linear-gradient(
+    150deg,
+    var(--color-gray-300) 0%,
+    var(--color-report-pending-dark) 17%,
+    var(--color-gray-600) 67%,
+    var(--color-report-pending-dark) 100%
+  );
 }
 
 /* Typography */

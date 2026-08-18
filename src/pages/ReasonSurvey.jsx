@@ -33,6 +33,7 @@ export default function ReasonSurvey() {
     saveDecision({
       name: product?.name,
       price: product?.price ?? 0,
+      image: product?.image ?? null,
       category: state?.category,
       type: state?.type,
       choice,

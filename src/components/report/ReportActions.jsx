@@ -30,6 +30,7 @@ export default function ReportActions({
     saveDecision({
       name: product?.name,
       price: product?.price ?? 0,
+      image: product?.image ?? null,
       category,
       type,
       choice: key,
