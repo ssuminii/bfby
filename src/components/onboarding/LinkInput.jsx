@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Button from '../Button'
+import SearchIcon from '../icons/SearchIcon'
 
 const isValidUrl = (value) => {
   const m = /^(https?:\/\/)?([^\s/:?#]+)([:/?#]\S*)?$/i.exec(value.trim())
@@ -49,22 +50,7 @@ export default function LinkInput({ onNext }) {
             boxShadow: '0px 0px 3px rgba(0, 0, 0, 0.08)',
           }}
         >
-          <svg
-            width='20'
-            height='20'
-            viewBox='0 0 20 20'
-            fill='none'
-            className='shrink-0'
-            aria-hidden='true'
-          >
-            <circle cx='9' cy='9' r='6.25' stroke='#b8b9ba' strokeWidth='1.5' />
-            <path
-              d='M13.5 13.5L17 17'
-              stroke='#b8b9ba'
-              strokeWidth='1.5'
-              strokeLinecap='round'
-            />
-          </svg>
+          <SearchIcon className='shrink-0 text-gray-500' />
           <input
             type='text'
             value={link}

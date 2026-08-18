@@ -79,13 +79,22 @@ const generate = async (prompt) => {
 }
 
 export async function generateFirstQuestion(productInfo) {
+  const selectedCategory = CATEGORIES.includes(productInfo.category)
+    ? productInfo.category
+    : null
+
   return generate(`
   상품명: ${productInfo.name}
   가격: ${productInfo.price?.toLocaleString()}원
+  ${selectedCategory ? `사용자가 선택한 카테고리: ${selectedCategory}` : ''}
 
   다음 작업을 수행해줘.
 
-  1. 이 상품의 카테고리를 [${CATEGORIES.join(', ')}] 중 하나로 분류해줘.
+  1. ${
+    selectedCategory
+      ? `카테고리는 사용자가 선택한 "${selectedCategory}"로 응답해줘.`
+      : `이 상품의 카테고리를 [${CATEGORIES.join(', ')}] 중 하나로 분류해줘.`
+  }
 
   2. 첫 번째 질문을 만들어줘.
 
