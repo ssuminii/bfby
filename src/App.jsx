@@ -6,6 +6,7 @@ import Reports from "./pages/Reports";
 import BuyOrNot from "./pages/BuyOrNot";
 import Consult from "./pages/Consult";
 import Report from "./pages/Report";
+import CardAcquired from "./pages/CardAcquired";
 import ReasonSurvey from "./pages/ReasonSurvey";
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
               <Route path="/buyornot" element={<BuyOrNot />} />
               <Route path="/consult" element={<Consult />} />
               <Route path="/report" element={<Report />} />
+              <Route path="/report/card" element={<CardAcquired />} />
               <Route path="/report/reason/:choice" element={<ReasonSurvey />} />
             </Routes>
           </div>

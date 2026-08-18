@@ -22,26 +22,34 @@ export default function Report() {
     state.category,
   );
   const theme = REPORT_THEME[report.type];
+  const usage = report.cards.find((card) =>
+    card.title.startsWith("한 번 사용할 때"),
+  );
 
   return (
-    <div className="h-full overflow-y-auto overflow-x-hidden bg-white">
-      <div className="min-h-full" style={{ background: theme.gradient }}>
-        <Header title="상담 결과" />
-
-        <div className="flex flex-col items-center px-6 pb-10">
-          <GaugeChart value={report.score} className="mt-20" />
-          <Verdict
-            title={theme.title}
-            subtitle={report.subtitle ?? theme.subtitle}
-          />
-          <CardList cards={report.cards} />
-          <ReportActions
-            actions={theme.actions}
-            saving={report.saving}
-            product={state.product}
-            category={state.category}
-            type={report.type}
-          />
+    <div className="flex h-full flex-col bg-white">
+      <Header title="상담 결과" />
+      <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
+        <div className="min-h-full" style={{ background: theme.gradient }}>
+          <div className="flex flex-col items-center px-6 pb-10">
+            <GaugeChart value={report.score} className="mt-20" />
+            <Verdict
+              title={theme.title}
+              subtitle={report.subtitle ?? theme.subtitle}
+            />
+            <CardList cards={report.cards} />
+            <ReportActions
+              actions={theme.actions}
+              saving={report.saving}
+              product={state.product}
+              category={state.category}
+              type={report.type}
+              note={
+                usage &&
+                `한 번 사용할 때마다 ${usage.amount} 정도의 비용이에요.`
+              }
+            />
+          </div>
         </div>
       </div>
     </div>

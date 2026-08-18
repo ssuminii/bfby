@@ -44,6 +44,18 @@ export const totalSaved = (history) =>
 export const isGoodSpending = (record) =>
   record.choice === 'buy' && record.type === 'recommend'
 
+/**
+ * 이번 결정으로 어떤 카드를 얻는지 판별한다. 얻는 카드가 없으면 null.
+ *
+ * 추천을 받고도 안 샀거나, 말렸는데 그래도 산 경우는 카드가 없다.
+ */
+export const cardKindOf = (record) => {
+  if (isGoodSpending(record)) return 'good'
+  if (isSaving(record)) return 'saving'
+  if (record.choice === 'hold') return 'pending'
+  return null
+}
+
 export function loadHistory() {
   try {
     const parsed = JSON.parse(localStorage.getItem(KEY))
@@ -54,11 +66,13 @@ export function loadHistory() {
   }
 }
 
+// at을 여기서 붙이므로, 저장된 모습 그대로를 돌려줘야 호출부가 같은 기록을 가리킬 수 있다
 export function saveDecision(record) {
+  const saved = { ...record, at: new Date().toISOString() }
   try {
-    const next = [...loadHistory(), { ...record, at: new Date().toISOString() }]
-    localStorage.setItem(KEY, JSON.stringify(next))
+    localStorage.setItem(KEY, JSON.stringify([...loadHistory(), saved]))
   } catch {
     // 기록은 부가 기능이라 저장 실패가 상담 흐름을 막으면 안 된다
   }
+  return saved
 }

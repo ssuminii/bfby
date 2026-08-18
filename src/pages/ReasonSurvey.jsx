@@ -30,7 +30,7 @@ export default function ReasonSurvey() {
 
   // 완료를 눌러야 비로소 결정으로 집계된다. 버튼을 누른 것만으로는 기록하지 않는다.
   const submit = () => {
-    saveDecision({
+    const record = {
       name: product?.name,
       price: product?.price ?? 0,
       image: product?.image ?? null,
@@ -38,9 +38,10 @@ export default function ReasonSurvey() {
       type: state?.type,
       choice,
       reason: answer,
-    });
-    // TODO: answer 를 서버로 보내고 이동할 화면 결정 (미정)
-    navigate("/reports");
+    };
+    const saved = saveDecision(record);
+    // TODO: answer 를 서버로 보내기 (미정)
+    navigate("/report/card", { state: { record: saved, link: product?.link } });
   };
 
   if (!survey) return null;
