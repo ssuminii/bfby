@@ -3,6 +3,7 @@ import Button from '../Button'
 import ConsumptionToggle from './ConsumptionToggle'
 import PendingCard from './PendingCard'
 import SpendingCard from './SpendingCard'
+import { SAMPLE_SPENDING_CARDS } from '../../mocks/spendingCards'
 
 const PREVIEW_SIZE = 6
 
@@ -11,10 +12,12 @@ export default function CollectionSection({ collections, pending }) {
   const [expanded, setExpanded] = useState(false)
   const records = collections[mode]
 
+  // 가진 카드를 먼저 채우고, 모자란 자리는 임시 샘플로 채운다
+  // TODO: 카드가 충분히 쌓이면 SAMPLE_SPENDING_CARDS 제거
   const cards = useMemo(() => {
     if (expanded) return records
-    const preview = [...Array(3).fill(null), ...records.slice(0, 3)]
-    return [...preview, ...Array(PREVIEW_SIZE - preview.length).fill(null)]
+    const preview = records.slice(0, PREVIEW_SIZE)
+    return [...preview, ...SAMPLE_SPENDING_CARDS.slice(preview.length, PREVIEW_SIZE)]
   }, [expanded, records])
 
   const changeMode = (nextMode) => {
@@ -42,7 +45,6 @@ export default function CollectionSection({ collections, pending }) {
           <SpendingCard
             key={record?.at ? `${record.at}-${index}` : `placeholder-${index}`}
             record={record}
-            index={index}
           />
         ))}
       </div>
