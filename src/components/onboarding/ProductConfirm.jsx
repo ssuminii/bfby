@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import Button from '../Button'
 import fetchProductInfo from '../../utils/fetchProductInfo'
+import ManualProductInput from './ManualProductInput'
+import ProductFetchError from './ProductFetchError'
 
 function ProductSkeleton() {
   return (
@@ -23,6 +25,7 @@ export default function ProductConfirm({ link, onNext, onBack }) {
   const [product, setProduct] = useState(null)
   const [fetchStatus, setFetchStatus] = useState(link ? 'loading' : 'error')
   const [phase, setPhase] = useState('idle') // idle | loading | done
+  const [manualInput, setManualInput] = useState(false)
 
   // 링크에서 상품 정보 조회
   useEffect(() => {
@@ -65,6 +68,25 @@ export default function ProductConfirm({ link, onNext, onBack }) {
     return () => clearTimeout(timer)
   }, [phase, onNext, product])
 
+  if (manualInput) {
+    return (
+      <ManualProductInput
+        onBack={() => setManualInput(false)}
+        onSubmit={onNext}
+      />
+    )
+  }
+
+  if (fetchStatus === 'error') {
+    return (
+      <ProductFetchError
+        link={link}
+        onBack={onBack}
+        onManualInput={() => setManualInput(true)}
+      />
+    )
+  }
+
   return (
     <div className='relative flex flex-col h-full bg-white'>
       <div className='h-[26%] min-h-[110px] shrink flex items-end justify-center px-6 pb-[38px]'>
@@ -85,16 +107,6 @@ export default function ProductConfirm({ link, onNext, onBack }) {
         aria-busy={fetchStatus === 'loading'}
       >
         {fetchStatus === 'loading' && <ProductSkeleton />}
-
-        {fetchStatus === 'error' && (
-          <div className='flex flex-1 flex-col items-center justify-center text-center'>
-            <p className='text-body1 font-bold text-gray-800'>링크에서 상품 정보를 찾지 못했어요.</p>
-            <p className='mt-2 text-body2 font-medium text-gray-600'>다른 상품 링크로 다시 시도해 주세요.</p>
-            <Button onClick={onBack} variant='dark' className='mt-8'>
-              링크 다시 입력하기
-            </Button>
-          </div>
-        )}
 
         {fetchStatus === 'ready' && product && (
           <>
