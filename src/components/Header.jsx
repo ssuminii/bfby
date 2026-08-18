@@ -5,7 +5,7 @@ export default function Header({ title }) {
   const navigate = useNavigate();
 
   return (
-    <header className="relative h-[58px] flex items-center justify-center bg-white">
+    <header className="relative h-[58px] shrink-0 flex items-center justify-center bg-white">
       <button
         type="button"
         onClick={() => navigate(-1)}
@@ -15,7 +15,7 @@ export default function Header({ title }) {
         <ChevronLeftIcon className="block text-black" />
       </button>
       {title && (
-        <p className="text-title font-bold text-gray-800 leading-[30px] tracking-tight-2">
+        <p className="absolute bottom-[10px] left-1/2 -translate-x-1/2 whitespace-nowrap text-title text-black">
           {title}
         </p>
       )}
