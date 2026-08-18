@@ -21,7 +21,6 @@ export default function CollectionSection({ collections, pending, justAdded }) {
     landingRef.current?.scrollIntoView({ block: "center" });
   }, [justAdded]);
 
-  // 가진 카드를 먼저 채우고, 모자란 만큼만 빈 자리로 남긴다
   const cards = useMemo(() => {
     if (expanded) return records;
     const preview = records.slice(0, PREVIEW_SIZE);
