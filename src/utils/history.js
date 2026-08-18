@@ -66,11 +66,13 @@ export function loadHistory() {
   }
 }
 
+// at을 여기서 붙이므로, 저장된 모습 그대로를 돌려줘야 호출부가 같은 기록을 가리킬 수 있다
 export function saveDecision(record) {
+  const saved = { ...record, at: new Date().toISOString() }
   try {
-    const next = [...loadHistory(), { ...record, at: new Date().toISOString() }]
-    localStorage.setItem(KEY, JSON.stringify(next))
+    localStorage.setItem(KEY, JSON.stringify([...loadHistory(), saved]))
   } catch {
     // 기록은 부가 기능이라 저장 실패가 상담 흐름을 막으면 안 된다
   }
+  return saved
 }

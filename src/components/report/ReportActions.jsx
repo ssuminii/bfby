@@ -35,9 +35,11 @@ export default function ReportActions({
       type,
       choice: key,
     };
-    saveDecision(record);
+    const saved = saveDecision(record);
 
-    navigate("/report/card", { state: { record, note, link: product?.link } });
+    navigate("/report/card", {
+      state: { record: saved, note, link: product?.link },
+    });
   };
 
   return (

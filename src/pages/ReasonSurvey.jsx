@@ -39,9 +39,9 @@ export default function ReasonSurvey() {
       choice,
       reason: answer,
     };
-    saveDecision(record);
+    const saved = saveDecision(record);
     // TODO: answer 를 서버로 보내기 (미정)
-    navigate("/report/card", { state: { record, link: product?.link } });
+    navigate("/report/card", { state: { record: saved, link: product?.link } });
   };
 
   if (!survey) return null;
