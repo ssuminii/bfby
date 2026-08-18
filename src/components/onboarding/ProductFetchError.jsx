@@ -1,5 +1,6 @@
 import Button from '../Button'
 import Header from '../Header'
+import Input from '../Input'
 import SearchIcon from '../icons/SearchIcon'
 
 export default function ProductFetchError({ link, onBack, onManualInput }) {
@@ -17,15 +18,12 @@ export default function ProductFetchError({ link, onBack, onManualInput }) {
       </div>
 
       <section className='flex-1 flex flex-col rounded-t-[50px] bg-gray-50 px-6 pb-10 pt-6 drop-shadow-[0_0_3px_rgba(0,0,0,0.12)]'>
-        <div className='flex h-14 w-full items-center gap-2.5 rounded-2xl border-2 border-error bg-white px-7.5'>
-          <SearchIcon className='shrink-0 text-gray-600' />
-          <p
-            className='min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-body2 text-gray-600'
-            title={link}
-          >
-            {link}
-          </p>
-        </div>
+        <Input
+          value={link}
+          invalid
+          icon={<SearchIcon className='shrink-0 text-gray-500' />}
+          className='h-14'
+        />
 
         <div className='mt-auto flex flex-col gap-2'>
           <Button onClick={onManualInput} variant='dark' className='text-head'>

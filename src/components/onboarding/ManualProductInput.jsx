@@ -3,6 +3,7 @@ import cameraIcon from '../../assets/icons/camera.svg'
 import checkListIcon from '../../assets/icons/check-list.svg'
 import Button from '../Button'
 import Header from '../Header'
+import Input from '../Input'
 
 const CATEGORIES = ['의류', '뷰티', '전자기기', '생활용품', '식품', '취미·운동', '기타']
 
@@ -56,14 +57,12 @@ export default function ManualProductInput({ onBack, onSubmit }) {
               상품명
             </label>
             <div className='flex flex-col gap-2'>
-              <input
+              <Input
                 id='manual-product-name'
-                type='text'
                 value={name}
                 onChange={(event) => setName(event.target.value)}
                 maxLength={100}
                 placeholder='예: 갤럭시 탭 S9 울트라 256GB 14.6인치 베이지'
-                className='h-[50px] w-full rounded-2xl bg-white px-4 text-body1 text-gray-800 outline-none placeholder:text-gray-600 focus:ring-2 focus:ring-blue-300'
               />
               <p className='text-caption text-gray-500'>
                 * 자세히 적어주실수록 더욱 정확한 분석이 가능해요.
@@ -75,14 +74,12 @@ export default function ManualProductInput({ onBack, onSubmit }) {
             <label htmlFor='manual-product-price' className='text-head text-gray-800'>
               상품 금액
             </label>
-            <input
+            <Input
               id='manual-product-price'
-              type='text'
-              inputMode='numeric'
               value={price}
               onChange={(event) => setPrice(formatPrice(event.target.value))}
               placeholder='금액을 입력해 주세요.'
-              className='h-[50px] w-full rounded-2xl bg-white px-4 text-body1 text-gray-800 outline-none placeholder:text-gray-600 focus:ring-2 focus:ring-blue-300'
+              inputMode='numeric'
             />
           </section>
 
