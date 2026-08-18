@@ -12,6 +12,7 @@ export default function ReportActions({
   product,
   category,
   type,
+  note,
 }) {
   const navigate = useNavigate();
 
@@ -26,16 +27,17 @@ export default function ReportActions({
     }
 
     // 살래요는 물어볼 이유가 없으니 누른 순간이 결정
-    // 추천 리포트에서 누른 것만 좋은 소비가 된다 (utils/history.js의 isGoodSpending).
-    saveDecision({
+    const record = {
       name: product?.name,
       price: product?.price ?? 0,
       image: product?.image ?? null,
       category,
       type,
       choice: key,
-    });
-    navigate("/reports");
+    };
+    saveDecision(record);
+
+    navigate("/report/card", { state: { record, note, link: product?.link } });
   };
 
   return (

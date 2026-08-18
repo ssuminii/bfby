@@ -22,6 +22,9 @@ export default function Report() {
     state.category,
   );
   const theme = REPORT_THEME[report.type];
+  const usage = report.cards.find((card) =>
+    card.title.startsWith("한 번 사용할 때"),
+  );
 
   return (
     <div className="flex h-full flex-col bg-white">
@@ -41,6 +44,10 @@ export default function Report() {
               product={state.product}
               category={state.category}
               type={report.type}
+              note={
+                usage &&
+                `한 번 사용할 때마다 ${usage.amount} 정도의 비용이에요.`
+              }
             />
           </div>
         </div>
