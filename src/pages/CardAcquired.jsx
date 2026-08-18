@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import Button from "../components/Button";
 import SpendingCard from "../components/reports/SpendingCard";
@@ -6,11 +7,50 @@ import { tierOf } from "../constants/cardTier";
 import { cardKindOf } from "../utils/history";
 
 const COPY = {
-  // 산 물건이니 링크를 복사해 실제 구매로 이어갈 수 있다
   good: { title: "합리적인 소비 카드를\n습득했어요!", showLink: true },
   saving: { title: "절약한 소비 카드를\n습득했어요!" },
   pending: { title: "보류 카드에\n담아뒀어요!" },
 };
+
+function CopyLinkButton({ link }) {
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (!copied) return;
+    const timer = setTimeout(() => setCopied(false), 2000);
+    return () => clearTimeout(timer);
+  }, [copied]);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(link);
+      setCopied(true);
+    } catch {}
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={handleCopy}
+      className={`flex h-[52px] items-center justify-center gap-2 rounded-xl text-head ${
+        copied
+          ? "border-2 border-success bg-white text-success"
+          : "bg-gray-100 text-gray-600"
+      }`}
+    >
+      {!copied && (
+        <span className="relative block size-6 overflow-clip">
+          <img
+            src={linkIcon}
+            alt=""
+            className="absolute inset-x-[8.33%] inset-y-[29.17%] block h-[41.66%] w-[83.34%]"
+          />
+        </span>
+      )}
+      {copied ? "복사했어요!" : "상품 링크 복사하기"}
+    </button>
+  );
+}
 
 export default function CardAcquired() {
   const navigate = useNavigate();
@@ -18,14 +58,12 @@ export default function CardAcquired() {
   const record = state?.record ?? null;
   const kind = record && cardKindOf(record);
 
+  // 얻는 카드가 없는 결정이거나 기록 없이 들어온 경우 보여줄 게 없다
   if (!kind) return <Navigate to="/reports" replace />;
 
   const copy = COPY[kind];
   const tier = tierOf(record.price ?? 0);
-
-  const copyLink = () => {
-    if (state?.link) navigator.clipboard?.writeText(state.link);
-  };
+  const link = state?.link;
 
   return (
     <div className="relative h-full overflow-hidden bg-white">
@@ -52,22 +90,7 @@ export default function CardAcquired() {
       </div>
 
       <div className="absolute bottom-10 left-1/2 flex w-[345px] -translate-x-1/2 flex-col gap-3">
-        {copy.showLink && (
-          <button
-            type="button"
-            onClick={copyLink}
-            className="flex h-[52px] items-center justify-center gap-2 rounded-xl bg-gray-100"
-          >
-            <span className="relative block size-6 overflow-clip">
-              <img
-                src={linkIcon}
-                alt=""
-                className="absolute inset-x-[8.33%] inset-y-[29.17%] block h-[41.66%] w-[83.34%]"
-              />
-            </span>
-            <span className="text-head text-gray-600">상품 링크 복사하기</span>
-          </button>
-        )}
+        {copy.showLink && link && <CopyLinkButton link={link} />}
 
         <Button variant="dark" onClick={() => navigate("/reports")}>
           카드 보관함으로 이동
