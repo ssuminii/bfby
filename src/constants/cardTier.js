@@ -36,3 +36,14 @@ export const TIERS = [
 ]
 
 export const tierOf = (price = 0) => TIERS.find((tier) => price >= tier.min) ?? TIERS.at(-1)
+
+/**
+ * 보류 카드는 산 건지 아닌지 아직 확정이 아니라 금액으로 등급을 매기지 않는다.
+ * ponytail: 전용 시안이 나오면 교체한다. 지금은 무늬 없는 단색 회색.
+ */
+export const PENDING_TIER = {
+  sunburst: null,
+  color: 'bg-gray-300',
+  glow: '#c6cbd2',
+  ink: 'text-report-card-ink',
+}

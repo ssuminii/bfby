@@ -2,7 +2,8 @@ import beautyImage from '../../assets/reports/beauty.png'
 import foodImage from '../../assets/reports/food.png'
 import hobbyImage from '../../assets/reports/hobby.png'
 import placeholderImage from '../../assets/reports/product-placeholder.png'
-import { tierOf } from '../../constants/cardTier'
+import { PENDING_TIER, tierOf } from '../../constants/cardTier'
+import { cardKindOf } from '../../utils/history'
 
 const CATEGORY_IMAGES = {
   뷰티: beautyImage,
@@ -44,7 +45,8 @@ export default function SpendingCard({ record, size = 'sm' }) {
   }
 
   const price = record.price ?? 0
-  const tier = tierOf(price)
+  const pending = cardKindOf(record) === 'pending'
+  const tier = pending ? PENDING_TIER : tierOf(price)
   const category = record.category ?? '카테고리'
   const categoryLabel = CATEGORY_LABELS[category] ?? category
   const image = record.image || CATEGORY_IMAGES[category] || placeholderImage
@@ -53,8 +55,12 @@ export default function SpendingCard({ record, size = 'sm' }) {
     <article
       className={`flex flex-col overflow-hidden drop-shadow-[0_0_2px_rgba(0,0,0,0.12)] ${style.card}`}
     >
-      <div className='relative flex flex-1 items-center justify-center overflow-hidden'>
-        <img src={tier.sunburst} alt='' className='absolute inset-0 size-full object-cover' />
+      <div
+        className={`relative flex flex-1 items-center justify-center overflow-hidden ${tier.color}`}
+      >
+        {tier.sunburst && (
+          <img src={tier.sunburst} alt='' className='absolute inset-0 size-full object-cover' />
+        )}
         <img src={image} alt='' className={`relative object-contain ${style.product}`} />
         <span className={`pointer-events-none absolute inset-0 ${style.topShadow}`} />
       </div>
