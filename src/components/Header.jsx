@@ -1,14 +1,14 @@
 import { useNavigate } from "react-router-dom";
 import ChevronLeftIcon from "./icons/ChevronLeftIcon";
 
-export default function Header({ title }) {
+export default function Header({ title, onBack }) {
   const navigate = useNavigate();
 
   return (
     <header className="relative h-[58px] shrink-0 flex items-center justify-center bg-white">
       <button
         type="button"
-        onClick={() => navigate(-1)}
+        onClick={onBack ?? (() => navigate(-1))}
         aria-label="뒤로 가기"
         className="absolute left-2 top-1/2 -translate-y-1/2 bg-transparent"
       >
