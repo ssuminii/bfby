@@ -44,6 +44,18 @@ export const totalSaved = (history) =>
 export const isGoodSpending = (record) =>
   record.choice === 'buy' && record.type === 'recommend'
 
+/**
+ * 이번 결정으로 어떤 카드를 얻는지 판별한다. 얻는 카드가 없으면 null.
+ *
+ * 추천을 받고도 안 샀거나, 말렸는데 그래도 산 경우는 카드가 없다.
+ */
+export const cardKindOf = (record) => {
+  if (isGoodSpending(record)) return 'good'
+  if (isSaving(record)) return 'saving'
+  if (record.choice === 'hold') return 'pending'
+  return null
+}
+
 export function loadHistory() {
   try {
     const parsed = JSON.parse(localStorage.getItem(KEY))
