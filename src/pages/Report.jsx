@@ -24,24 +24,25 @@ export default function Report() {
   const theme = REPORT_THEME[report.type];
 
   return (
-    <div className="h-full overflow-y-auto overflow-x-hidden bg-white">
-      <div className="min-h-full" style={{ background: theme.gradient }}>
-        <Header title="상담 결과" />
-
-        <div className="flex flex-col items-center px-6 pb-10">
-          <GaugeChart value={report.score} className="mt-20" />
-          <Verdict
-            title={theme.title}
-            subtitle={report.subtitle ?? theme.subtitle}
-          />
-          <CardList cards={report.cards} />
-          <ReportActions
-            actions={theme.actions}
-            saving={report.saving}
-            product={state.product}
-            category={state.category}
-            type={report.type}
-          />
+    <div className="flex h-full flex-col bg-white">
+      <Header title="상담 결과" />
+      <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
+        <div className="min-h-full" style={{ background: theme.gradient }}>
+          <div className="flex flex-col items-center px-6 pb-10">
+            <GaugeChart value={report.score} className="mt-20" />
+            <Verdict
+              title={theme.title}
+              subtitle={report.subtitle ?? theme.subtitle}
+            />
+            <CardList cards={report.cards} />
+            <ReportActions
+              actions={theme.actions}
+              saving={report.saving}
+              product={state.product}
+              category={state.category}
+              type={report.type}
+            />
+          </div>
         </div>
       </div>
     </div>
