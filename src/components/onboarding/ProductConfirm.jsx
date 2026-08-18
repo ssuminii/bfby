@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Button from "../Button";
+import Header from "../Header";
 import fetchProductInfo from "../../utils/fetchProductInfo";
 import ManualProductInput from "./ManualProductInput";
 import ProductFetchError from "./ProductFetchError";
@@ -94,6 +95,7 @@ export default function ProductConfirm({ link, onNext, onBack }) {
 
   return (
     <div className="relative flex flex-col h-full bg-white">
+      <Header onBack={onBack} />
       <div className="h-[26%] min-h-[110px] shrink flex items-end justify-center px-6 pb-[38px]">
         <p
           className="text-title font-bold text-gray-800 text-center whitespace-nowrap"

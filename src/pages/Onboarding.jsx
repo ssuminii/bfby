@@ -25,6 +25,8 @@ export default function Onboarding() {
       {step === 'category' && <RegretSurvey onNext={next} />}
       {step === 'link' && (
         <LinkInput
+          showHeader
+          onBack={() => setStep('category')}
           onNext={(value) => {
             setLink(value)
             next()

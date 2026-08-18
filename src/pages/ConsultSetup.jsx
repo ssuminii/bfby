@@ -12,7 +12,6 @@ export default function ConsultSetup() {
     <div className='flex flex-col h-full relative overflow-hidden'>
       {step === 'link' && (
         <LinkInput
-          showHeader
           onNext={(value) => {
             setLink(value)
             setStep('confirm')

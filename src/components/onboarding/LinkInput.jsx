@@ -13,15 +13,15 @@ const isValidUrl = (value) => {
   return labels.length >= (labels[0].toLowerCase() === 'www' ? 3 : 2)
 }
 
-export default function LinkInput({ onNext, showHeader = false }) {
+export default function LinkInput({ onNext, onBack }) {
   const [link, setLink] = useState('')
   const [focused, setFocused] = useState(false)
   const invalid = link !== '' && !isValidUrl(link)
 
   return (
     <div className='flex flex-col h-full bg-white'>
-      {showHeader && <Header />}
-      <div className={`h-[33%] min-h-[130px] shrink flex flex-col items-center justify-end gap-[10px] text-center px-6 pb-[54px] ${showHeader ? 'pt-10' : ''}`}>
+      <Header onBack={onBack} />
+      <div className='h-[33%] min-h-[130px] shrink flex flex-col items-center justify-end gap-[10px] text-center px-6 pb-[54px] pt-10'>
         <p
           className='text-title font-bold text-gray-800 whitespace-nowrap'
           style={{ letterSpacing: '-0.4px', lineHeight: 1.5 }}

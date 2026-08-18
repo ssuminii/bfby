@@ -2,7 +2,7 @@ import { useRef, useState } from 'react'
 import cameraIcon from '../../assets/icons/camera.svg'
 import checkListIcon from '../../assets/icons/check-list.svg'
 import Button from '../Button'
-import ChevronLeftIcon from '../icons/ChevronLeftIcon'
+import Header from '../Header'
 
 const CATEGORIES = ['의류', '뷰티', '전자기기', '생활용품', '식품', '취미·운동', '기타']
 
@@ -46,22 +46,10 @@ export default function ManualProductInput({ onBack, onSubmit }) {
   }
 
   return (
-    <div className='relative h-full bg-gray-50'>
-      <header className='absolute inset-x-0 top-0 z-20 h-[120px] bg-white'>
-        <button
-          type='button'
-          onClick={onBack}
-          aria-label='뒤로 가기'
-          className='absolute bottom-0 left-2 flex size-12 items-center justify-center bg-transparent text-black'
-        >
-          <ChevronLeftIcon />
-        </button>
-        <h1 className='absolute bottom-[10px] left-1/2 -translate-x-1/2 whitespace-nowrap text-title text-black'>
-          직접 입력
-        </h1>
-      </header>
+    <div className='flex flex-col h-full bg-gray-50'>
+      <Header title='직접 입력' onBack={onBack} />
 
-      <div className='absolute inset-x-0 bottom-0 top-[120px] overflow-y-auto px-6 pb-[140px] pt-6'>
+      <div className='flex-1 overflow-y-auto px-6 pt-6 pb-4'>
         <div className='flex flex-col gap-12'>
           <section className='flex flex-col gap-4'>
             <label htmlFor='manual-product-name' className='text-head text-gray-800'>
@@ -164,12 +152,8 @@ export default function ManualProductInput({ onBack, onSubmit }) {
         </div>
       </div>
 
-      <div className='absolute inset-x-6 bottom-10 z-10'>
-        <Button
-          onClick={handleSubmit}
-          variant={canSubmit ? 'dark' : 'default'}
-          className='text-head'
-        >
+      <div className='px-6 pb-10 pt-4 shrink-0'>
+        <Button onClick={handleSubmit} variant={canSubmit ? 'dark' : 'default'} className='text-head'>
           분석 시작
         </Button>
       </div>
