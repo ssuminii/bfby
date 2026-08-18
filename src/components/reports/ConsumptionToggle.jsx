@@ -15,9 +15,7 @@ export default function ConsumptionToggle({ value, onChange }) {
             onClick={() => onChange(option.value)}
             aria-pressed={active}
             className={`flex h-full w-[140px] items-center justify-center rounded-[19px] text-head transition-colors ${
-              active
-                ? 'border-2 border-blue-500 bg-blue-50 text-blue-500'
-                : 'text-gray-600'
+              active ? 'border-2 border-blue-500 bg-blue-50 text-blue-500' : 'text-gray-500'
             }`}
           >
             {option.label}

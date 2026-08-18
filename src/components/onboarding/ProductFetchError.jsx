@@ -11,7 +11,7 @@ export default function ProductFetchError({ link, onBack, onManualInput }) {
       title={
         <>
           <h1 className='text-title text-black'>페이지를 읽지 못했어요.</h1>
-          <p className='text-body2 text-gray-600'>
+          <p className='text-body2 text-gray-500'>
             로그인이 필요한 페이지거나,
             <br />
             아직 지원하지 않는 쇼핑몰이에요.

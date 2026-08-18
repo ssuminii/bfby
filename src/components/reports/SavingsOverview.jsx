@@ -17,12 +17,11 @@ export default function SavingsOverview({ summary }) {
           <p className='text-title text-gray-800'>지금까지</p>
           <p className='text-title text-gray-800'>
             충동구매를 <span className='text-blue-500'>{summary.savingCount}번</span> 참았고,
-            <br />
-            총 <span className='text-blue-500'>{won(summary.totalSaved)}</span> 절약했어요.
+            <br />총 <span className='text-blue-500'>{won(summary.totalSaved)}</span> 절약했어요.
           </p>
         </div>
 
-        <div className='mt-6 whitespace-nowrap text-bodyb text-gray-600'>
+        <div className='mt-6 whitespace-nowrap text-bodyb text-gray-500'>
           <p>🛍️ 월평균 {won(summary.monthlyAverage)} 절약했어요.</p>
           {summary.isIncreasing && <p>📈 지난 2개월 동안 절약액이 늘고 있어요! 🥳</p>}
         </div>

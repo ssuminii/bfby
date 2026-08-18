@@ -14,15 +14,17 @@ const TABS = [
 
 export default function NavBar() {
   return (
-    <div className="flex items-start justify-center gap-11 px-6 bg-white drop-shadow-[0px_0px_6px_rgba(0,0,0,0.12)] shrink-0">
+    <div className='flex items-start justify-center gap-11 px-6 bg-white drop-shadow-[0px_0px_6px_rgba(0,0,0,0.12)] shrink-0'>
       {TABS.map(({ to, label, Icon, ActiveIcon }) => (
-        <NavLink key={to} to={to} end className="flex flex-col items-center py-4 w-18.5">
+        <NavLink key={to} to={to} end className='flex flex-col items-center py-4 w-18.5'>
           {({ isActive }) => (
-            <div className="flex flex-col items-center justify-center gap-1 h-12">
-              <div className="size-8 flex items-center justify-center">
+            <div className='flex flex-col items-center justify-center gap-1 h-12'>
+              <div className='size-8 flex items-center justify-center'>
                 {isActive ? <ActiveIcon /> : <Icon />}
               </div>
-              <span className={`text-bodyb font-bold ${isActive ? 'text-gray-800' : 'text-gray-600'}`}>
+              <span
+                className={`text-bodyb font-bold ${isActive ? 'text-gray-800' : 'text-gray-500'}`}
+              >
                 {label}
               </span>
             </div>

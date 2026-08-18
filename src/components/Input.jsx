@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-export default function Input({ value, onChange, placeholder, invalid, icon, className = '', ...props }) {
+export default function Input({ value, onChange, placeholder, invalid, icon, bordered = false, className = '', ...props }) {
   const [focused, setFocused] = useState(false)
   const readOnly = !onChange
 
@@ -8,7 +8,9 @@ export default function Input({ value, onChange, placeholder, invalid, icon, cla
     ? 'border-2 border-error'
     : focused
       ? 'border-2 border-blue-500'
-      : 'border-2 border-gray-100'
+      : bordered
+        ? 'border-2 border-gray-100'
+        : ''
 
   return (
     <div

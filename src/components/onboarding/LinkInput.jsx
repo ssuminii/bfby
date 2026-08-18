@@ -40,6 +40,7 @@ export default function LinkInput({ onNext, onBack }) {
         placeholder='이곳에 구매 링크를 붙여넣어 볼까요?'
         invalid={invalid}
         icon={<SearchIcon className='shrink-0 text-gray-500' />}
+        bordered
         className='h-14'
       />
 
