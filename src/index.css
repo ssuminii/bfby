@@ -146,6 +146,32 @@
     margin: 0;
     padding: 0;
   }
+
+  /* 앱이 393px 폰 프레임 안에서 도는데, 데스크톱의 클래식 스크롤바는
+     그 폭을 그대로 깎아먹는다. 얇은 반투명 막대로 존재만 남긴다. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--color-gray-500) 35%, transparent)
+      transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: color-mix(in srgb, var(--color-gray-500) 35%, transparent);
+    border-radius: 100px;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: color-mix(in srgb, var(--color-gray-500) 55%, transparent);
+  }
 }
 
 body {
