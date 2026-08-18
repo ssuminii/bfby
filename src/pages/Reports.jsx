@@ -4,6 +4,7 @@ import NavBar from "../components/NavBar";
 import CollectionSection from "../components/reports/CollectionSection";
 import SavingsOverview from "../components/reports/SavingsOverview";
 import { loadHistory } from "../utils/history";
+import { MOCK_HISTORY } from "../mocks/history";
 import {
   pendingDecisions,
   reportHistorySummary,
@@ -11,7 +12,7 @@ import {
 } from "../utils/reportHistory";
 
 export default function Reports() {
-  const [history] = useState(() => loadHistory());
+  const [history] = useState(() => [...MOCK_HISTORY, ...loadHistory()]);
   const summary = useMemo(() => reportHistorySummary(history), [history]);
   const collections = useMemo(() => spendingCollections(history), [history]);
   const pending = useMemo(() => pendingDecisions(history), [history]);
