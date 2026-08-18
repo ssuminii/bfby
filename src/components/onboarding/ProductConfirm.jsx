@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Button from "../Button";
+import Header from "../Header";
 import fetchProductInfo from "../../utils/fetchProductInfo";
 import ManualProductInput from "./ManualProductInput";
 import ProductFetchError from "./ProductFetchError";
@@ -94,28 +95,25 @@ export default function ProductConfirm({ link, onNext, onBack }) {
 
   return (
     <div className="relative flex flex-col h-full bg-white">
-      <div className="h-[26%] min-h-[110px] shrink flex items-end justify-center px-6 pb-[38px]">
-        <p
-          className="text-title font-bold text-gray-800 text-center whitespace-nowrap"
-          style={{ letterSpacing: "-0.4px", lineHeight: 1.5 }}
-        >
+      <Header onBack={onBack} />
+
+      <div className="flex items-center justify-center px-6 pt-8 pb-6">
+        <p className="text-title font-bold text-gray-800 text-center">
           {fetchStatus === "loading"
             ? "상품 정보를 불러오고 있어요"
-            : fetchStatus === "error"
-              ? "상품 정보를 불러오지 못했어요"
-              : "사고 싶은 상품이 이 상품이 맞나요?"}
+            : "사고 싶은 상품이 이 상품이 맞나요?"}
         </p>
       </div>
 
       <div
-        className="flex-1 min-h-0 flex flex-col bg-gray-50 rounded-tl-[50px] rounded-tr-[50px] drop-shadow-[0px_0px_3px_rgba(0,0,0,0.12)] px-6 pt-6 pb-[42px]"
+        className="flex-1 min-h-0 overflow-y-auto px-6"
         aria-busy={fetchStatus === "loading"}
       >
         {fetchStatus === "loading" && <ProductSkeleton />}
 
         {fetchStatus === "ready" && product && (
-          <>
-            <div className="h-[210px] shrink-0 flex items-center justify-center bg-white rounded-[24px] overflow-hidden">
+          <div className="flex flex-col gap-6">
+            <div className="h-51 shrink-0 flex items-center justify-center bg-gray-50 border-2 border-gray-100 rounded-3xl overflow-hidden">
               {product.image && (
                 <img
                   src={product.image}
@@ -125,47 +123,43 @@ export default function ProductConfirm({ link, onNext, onBack }) {
               )}
             </div>
 
-            <p
-              className="mt-5 text-body1 font-medium text-gray-800"
-              style={{ letterSpacing: "-0.16px", lineHeight: 1.5 }}
-            >
-              {product.name}
-            </p>
-
-            {product.price !== null && (
-              <p
-                className="mt-3 text-price font-bold text-gray-800"
-                style={{ letterSpacing: "-0.22px", lineHeight: 1.5 }}
-              >
-                {product.price.toLocaleString()}원
-              </p>
-            )}
-
-            {product.tags.length > 0 && (
-              <div className="mt-4 flex flex-wrap gap-2">
-                {product.tags.map((tag, i) => (
-                  <span
-                    key={i}
-                    className="flex items-center h-[30px] px-4 rounded-full bg-white border border-gray-100 text-gray-500 font-medium"
-                    style={{ fontSize: "12px", letterSpacing: "-0.12px" }}
-                  >
-                    {tag}
-                  </span>
-                ))}
+            <div className="flex flex-col gap-5">
+              <div className="flex flex-col gap-3">
+                <p className="text-head font-bold text-gray-800">{product.name}</p>
+                {product.price !== null && (
+                  <p className="text-price font-bold text-gray-800">
+                    {product.price.toLocaleString()}원
+                  </p>
+                )}
               </div>
-            )}
 
-            <div className="mt-auto pt-4 flex flex-col gap-3">
-              <Button onClick={() => setPhase("loading")} variant="dark">
-                맞아요, 시작하기
-              </Button>
-              <Button onClick={onBack} variant="secondary">
-                이 링크가 아니에요
-              </Button>
+              {product.tags.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {product.tags.map((tag, i) => (
+                    <span
+                      key={i}
+                      className="flex items-center h-7.5 px-3 rounded-full bg-white border-2 border-gray-100 text-caption text-gray-500"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
-          </>
+          </div>
         )}
       </div>
+
+      {fetchStatus === "ready" && (
+        <div className="px-6 pt-4 pb-10 shrink-0 flex flex-col gap-2">
+          <Button onClick={() => setPhase("loading")} variant="dark">
+            맞아요, 시작하기
+          </Button>
+          <Button onClick={onBack} variant="secondary">
+            이 링크가 아니에요
+          </Button>
+        </div>
+      )}
 
       {phase !== "idle" && (
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/80">

@@ -13,9 +13,9 @@
   --color-gray-50: #f7f8fa;
   --color-gray-100: #edeff2;
   --color-gray-300: #c6cbd2;
-  --color-gray-400: #d3d3d3;
-  --color-gray-500: #b8b9ba;
-  --color-gray-600: #8b909a;
+  --color-gray-400: #a9aeb6;
+  --color-gray-500: #8b909a;
+  --color-gray-600: #686d75;
   --color-gray-700: #333d4c;
   --color-gray-800: #23262b;
 
@@ -152,8 +152,7 @@
      그 폭을 그대로 깎아먹는다. 얇은 반투명 막대로 존재만 남긴다. */
   * {
     scrollbar-width: thin;
-    scrollbar-color: color-mix(in srgb, var(--color-gray-500) 35%, transparent)
-      transparent;
+    scrollbar-color: color-mix(in srgb, var(--color-gray-500) 35%, transparent) transparent;
   }
 
   *::-webkit-scrollbar {

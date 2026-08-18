@@ -2,7 +2,8 @@ import { useRef, useState } from 'react'
 import cameraIcon from '../../assets/icons/camera.svg'
 import checkListIcon from '../../assets/icons/check-list.svg'
 import Button from '../Button'
-import ChevronLeftIcon from '../icons/ChevronLeftIcon'
+import Header from '../Header'
+import Input from '../Input'
 
 const CATEGORIES = ['의류', '뷰티', '전자기기', '생활용품', '식품', '취미·운동', '기타']
 
@@ -46,38 +47,24 @@ export default function ManualProductInput({ onBack, onSubmit }) {
   }
 
   return (
-    <div className='relative h-full bg-gray-50'>
-      <header className='absolute inset-x-0 top-0 z-20 h-[120px] bg-white'>
-        <button
-          type='button'
-          onClick={onBack}
-          aria-label='뒤로 가기'
-          className='absolute bottom-0 left-2 flex size-12 items-center justify-center bg-transparent text-black'
-        >
-          <ChevronLeftIcon />
-        </button>
-        <h1 className='absolute bottom-[10px] left-1/2 -translate-x-1/2 whitespace-nowrap text-title text-black'>
-          직접 입력
-        </h1>
-      </header>
+    <div className='flex flex-col h-full bg-gray-50'>
+      <Header title='직접 입력' onBack={onBack} />
 
-      <div className='absolute inset-x-0 bottom-0 top-[120px] overflow-y-auto px-6 pb-[140px] pt-6'>
+      <div className='flex-1 overflow-y-auto px-6 pt-6 pb-4'>
         <div className='flex flex-col gap-12'>
           <section className='flex flex-col gap-4'>
             <label htmlFor='manual-product-name' className='text-head text-gray-800'>
               상품명
             </label>
             <div className='flex flex-col gap-2'>
-              <input
+              <Input
                 id='manual-product-name'
-                type='text'
                 value={name}
                 onChange={(event) => setName(event.target.value)}
                 maxLength={100}
                 placeholder='예: 갤럭시 탭 S9 울트라 256GB 14.6인치 베이지'
-                className='h-[50px] w-full rounded-2xl bg-white px-4 text-body1 text-gray-800 outline-none placeholder:text-gray-600 focus:ring-2 focus:ring-blue-300'
               />
-              <p className='text-caption text-gray-500'>
+              <p className='text-caption text-gray-400'>
                 * 자세히 적어주실수록 더욱 정확한 분석이 가능해요.
               </p>
             </div>
@@ -87,14 +74,12 @@ export default function ManualProductInput({ onBack, onSubmit }) {
             <label htmlFor='manual-product-price' className='text-head text-gray-800'>
               상품 금액
             </label>
-            <input
+            <Input
               id='manual-product-price'
-              type='text'
-              inputMode='numeric'
               value={price}
               onChange={(event) => setPrice(formatPrice(event.target.value))}
               placeholder='금액을 입력해 주세요.'
-              className='h-[50px] w-full rounded-2xl bg-white px-4 text-body1 text-gray-800 outline-none placeholder:text-gray-600 focus:ring-2 focus:ring-blue-300'
+              inputMode='numeric'
             />
           </section>
 
@@ -112,7 +97,7 @@ export default function ManualProductInput({ onBack, onSubmit }) {
                     className={`min-w-16 rounded-[4px] text-body2 font-bold transition-colors ${
                       selected
                         ? 'bg-blue-100 text-blue-700 ring-2 ring-inset ring-blue-500'
-                        : 'bg-gray-100 text-gray-600'
+                        : 'bg-gray-100 text-gray-500'
                     }`}
                   >
                     {item}
@@ -124,18 +109,18 @@ export default function ManualProductInput({ onBack, onSubmit }) {
 
           <section className='flex flex-col gap-6'>
             <h2 className='text-head text-gray-800'>
-              사진 추가 <span className='text-gray-500'>(선택)</span>
+              사진 추가 <span className='text-gray-400'>(선택)</span>
             </h2>
 
             <div className='flex flex-col gap-2'>
-              <p className='whitespace-nowrap text-caption text-gray-600'>
+              <p className='whitespace-nowrap text-caption text-gray-500'>
                 다음과 같은 정보가 포함되면 더욱 정확한 분석 결과를 얻을 수 있어요.
               </p>
               <div className='flex items-center gap-2'>
                 <span className='flex size-5 shrink-0 items-center justify-center rounded-full bg-blue-100'>
                   <img src={checkListIcon} alt='' className='h-[8px] w-[10px]' />
                 </span>
-                <p className='text-caption text-gray-600'>
+                <p className='text-caption text-gray-500'>
                   상품 이미지 / 가격 / 할인율 / 리뷰 평점 및 갯수
                 </p>
               </div>
@@ -156,7 +141,7 @@ export default function ManualProductInput({ onBack, onSubmit }) {
               <span className='flex size-9 items-center justify-center overflow-hidden'>
                 <img src={cameraIcon} alt='' className='h-6 w-[27px]' />
               </span>
-              <span className='max-w-full truncate text-head text-gray-500'>
+              <span className='max-w-full truncate text-head text-gray-400'>
                 {imageName || '사진 추가'}
               </span>
             </button>
@@ -164,7 +149,7 @@ export default function ManualProductInput({ onBack, onSubmit }) {
         </div>
       </div>
 
-      <div className='absolute inset-x-6 bottom-10 z-10'>
+      <div className='px-6 pb-10 pt-4 shrink-0'>
         <Button
           onClick={handleSubmit}
           variant={canSubmit ? 'dark' : 'default'}

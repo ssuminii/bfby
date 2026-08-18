@@ -18,7 +18,7 @@ export default function Home() {
             <br />
             상품의 구매를 고민하고 계신가요?
           </p>
-          <p className='text-body2 text-gray-600'>링크만 있으면 30초면 끝나요.</p>
+          <p className='text-body2 text-gray-500'>링크만 있으면 30초면 끝나요.</p>
         </div>
 
         <div className='flex flex-col gap-9'>
