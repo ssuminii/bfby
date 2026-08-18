@@ -15,7 +15,7 @@ export default function PendingCard({ records }) {
   return (
     <section className='flex min-h-[200px] w-full items-center rounded-3xl bg-report-pending-gradient px-[14px] py-6 drop-shadow-[0_0_3px_rgba(0,0,0,0.12)]'>
       <div className='flex items-center gap-4'>
-        <SpendingCard record={first} index={1} />
+        <SpendingCard record={first} />
         <div className='w-[198px] shrink-0 text-white'>
           <h3 className='text-title'>보류 카드 {records.length}장</h3>
           <p className='mt-1 text-bodyb text-gray-50'>

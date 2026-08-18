@@ -37,11 +37,17 @@ const SIZES = {
 
 export default function SpendingCard({ record, size = 'sm' }) {
   const style = SIZES[size]
-  const price = record?.price ?? 0
+
+  // 아직 못 얻은 자리다. 가격 0짜리 카드로 그리면 등급까지 매겨져 실제 카드처럼 보인다.
+  if (!record) {
+    return <div aria-hidden className={`border-2 border-dashed border-gray-100 bg-gray-50 ${style.card}`} />
+  }
+
+  const price = record.price ?? 0
   const tier = tierOf(price)
-  const category = record?.category ?? '카테고리'
+  const category = record.category ?? '카테고리'
   const categoryLabel = CATEGORY_LABELS[category] ?? category
-  const image = record?.image || CATEGORY_IMAGES[category] || placeholderImage
+  const image = record.image || CATEGORY_IMAGES[category] || placeholderImage
 
   return (
     <article
