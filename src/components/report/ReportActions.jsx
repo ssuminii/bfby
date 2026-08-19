@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import Button from "../Button";
-import { REASON_SURVEY } from "../../constants/reasonSurvey";
+import { needsReasonSurvey } from "../../constants/reasonSurvey";
 import { saveDecision } from "../../utils/history";
 
 const fillLabel = (label, saving) =>
@@ -19,7 +19,7 @@ export default function ReportActions({
   const handle = (key) => {
     // 안 살래요·더 고민할게요는 이유 설문까지 마쳐야 결정으로 친다.
     // 중간에 뒤로 가면 기록에 남지 않아야 집계가 부풀지 않는다.
-    if (REASON_SURVEY[key]) {
+    if (needsReasonSurvey(key, type)) {
       navigate(`/report/reason/${key}`, {
         state: { product, category, type, choice: key },
       });

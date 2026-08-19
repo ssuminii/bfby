@@ -56,20 +56,30 @@ export default function ReasonSurvey() {
         <div className="min-h-full flex flex-col px-6 pb-[42px]">
           {showProduct && (
             <div className="mt-6">
-              <ProductSummary name={product.name} price={product.price} />
+              <ProductSummary
+                name={product.name}
+                price={product.price}
+                image={product.image}
+              />
             </div>
           )}
 
-          <p
-            className={`whitespace-pre-line text-title font-bold text-gray-800 leading-[1.5] tracking-tight-2
-              ${showProduct ? "mt-6" : "mt-10"}`}
-          >
-            {survey.question}
-          </p>
+          <div className={showProduct ? "mt-6" : "mt-10"}>
+            <p className="whitespace-pre-line text-title font-bold text-gray-800 leading-[1.5] tracking-tight-2">
+              {survey.question}
+            </p>
+            {survey.hint && (
+              <p className="mt-1 text-body2 text-gray-600">{survey.hint}</p>
+            )}
+          </div>
 
           <div className={showProduct ? "mt-6" : "mt-12"}>
-            <ReasonOptions selected={selected} onSelect={selectOption} />
-            <div className="mt-3 flex flex-col">
+            <ReasonOptions
+              options={survey.options}
+              selected={selected}
+              onSelect={selectOption}
+            />
+            <div className="mt-4 flex flex-col">
               <OtherInput value={other} onChange={changeOther} />
             </div>
           </div>
