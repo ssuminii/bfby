@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import Button from '../components/Button'
+import HoldSaved from '../components/report/HoldSaved'
 import SpendingCard from '../components/reports/SpendingCard'
 import linkIcon from '../assets/icons/link.svg'
 import { tierOf } from '../constants/cardTier'
@@ -10,7 +11,6 @@ import { withViewTransition } from '../utils/viewTransition'
 const COPY = {
   good: { title: '합리적인 소비 카드를\n습득했어요!', showLink: true },
   saving: { title: '절약한 소비 카드를\n습득했어요!' },
-  pending: { title: '보류 카드에\n담아뒀어요!' },
 }
 
 function CopyLinkButton({ link }) {
@@ -58,6 +58,9 @@ export default function CardAcquired() {
   const kind = record && cardKindOf(record)
 
   if (!kind) return <Navigate to='/reports' replace />
+
+  // 보류는 카드 발급이 확정되기 전이라 습득 화면을 쓰지 않는다
+  if (kind === 'pending') return <HoldSaved />
 
   const copy = COPY[kind]
   const tier = tierOf(record.price ?? 0)
