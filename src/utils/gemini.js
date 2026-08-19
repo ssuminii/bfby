@@ -8,6 +8,39 @@ const AXES = ['이미 있나', '얼마나 쓸까', '왜 하필 지금', '예산�
 
 const CATEGORIES = ['의류', '뷰티', '전자기기', '생활용품', '식품', '취미·운동']
 
+const TYPE_LABEL = {
+  recommend: '구매를 추천했어요',
+  hold: '보류를 조언했어요',
+  avoid: '추천하지 않았어요',
+}
+
+export async function generateHoldAdvice(record) {
+  const reasons = record.reasonItems?.map((r) => r.text).join(', ')
+  const response = await ai.models.generateContent({
+    model: 'gemini-3.5-flash-lite',
+    contents: `
+상품명: ${record.name}
+가격: ${record.price?.toLocaleString()}원
+상담 결과: ${TYPE_LABEL[record.type] ?? record.type}
+당시 사용자가 선택한 이유: "${record.reason ?? '없음'}"
+${reasons ? `상담에서 나온 근거: ${reasons}` : ''}
+
+이 상품을 보류해 둔 사용자가 다시 들어왔어.
+구매 결정을 돕기 위한 조언을 한두 문장으로 써줘.
+
+[규칙]
+- 해요체 존댓말
+- 사용자가 선택한 이유나 상담 근거를 자연스럽게 언급해
+- "사세요" / "사지 마세요" 같은 단정은 하지 마
+- 겁을 주거나 죄책감을 유발하지 마
+- 딱딱한 명사("구매 필요성", "활용도") 금지
+- 번역투("~으로 보여요", "~인 편이에요") 금지
+- 1~2문장, 순수 텍스트만 반환 (JSON 아님)
+`.trim(),
+  })
+  return response.text?.trim() ?? ''
+}
+
 // 휴대폰·노트북처럼 "이미 있는 게 당연한" 물건은 축 해석이 달라진다.
 // 질문 생성과 판정 양쪽에서 같은 기준을 써야 해서 한 곳에 모아둔다.
 // 질문 프롬프트에 섞이는 블록이라 짧게 유지할 것 — 길어지면 원래 있던

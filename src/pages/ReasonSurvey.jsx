@@ -40,6 +40,7 @@ export default function ReasonSurvey() {
         name: product?.name,
         price: product?.price ?? 0,
         image: product?.image ?? null,
+        link: product?.link ?? null,
         category: state?.category,
         type: state?.type,
         choice,
