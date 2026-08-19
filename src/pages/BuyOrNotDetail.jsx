@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
 import Card from '../components/Card'
@@ -8,6 +9,9 @@ import AiIcon from '../components/icons/AiIcon'
 import ReasonList from '../components/report/ReasonList'
 import ConcernProductCard from '../components/buyornot/ConcernProductCard'
 import { REPORT_THEME } from '../constants/reportTheme'
+import { generateHoldAdvice } from '../utils/gemini'
+
+const ADVICE_CACHE_PREFIX = 'bfby.advice.'
 
 const REASON_SECTION_TITLE = {
   recommend: '구매를 추천했던 이유',
@@ -25,6 +29,25 @@ export default function BuyOrNotDetail() {
   const { state } = useLocation()
   const navigate = useNavigate()
   const record = state?.record
+  const [advice, setAdvice] = useState(null)
+  const [adviceLoading, setAdviceLoading] = useState(false)
+
+  useEffect(() => {
+    if (!record?.at) return
+    const cacheKey = ADVICE_CACHE_PREFIX + record.at
+    const cached = localStorage.getItem(cacheKey)
+    if (cached) { setAdvice(cached); return }
+
+    setAdviceLoading(true)
+    generateHoldAdvice(record)
+      .then((text) => {
+        if (text) {
+          setAdvice(text)
+          try { localStorage.setItem(cacheKey, text) } catch {}
+        }
+      })
+      .finally(() => setAdviceLoading(false))
+  }, [record?.at])
 
   if (!record) return null
 
@@ -67,17 +90,20 @@ export default function BuyOrNotDetail() {
             </Card>
           )}
 
-          {/* AI 답변 생성 */}
-          <Card className="bg-white p-6 flex flex-col gap-3">
-            <div className="flex gap-2 items-start">
-              <AiIcon className="shrink-0" />
-              <p className="text-head text-gray-800">AI 답변 생성</p>
-            </div>
-            <p className="text-body1 text-gray-800">
-              이 섹션은 '어떤 점이 걸리셨나요?' 페이지에서 사용자의 응답을 토대로 AI가 1줄 정도 자동 조언합니다.
-              {'\n'}(가격은 밑에 고정으로 있어서 제외)
-            </p>
-          </Card>
+          {/* AI 조언 */}
+          {(advice || adviceLoading) && (
+            <Card className="bg-white p-6 flex flex-col gap-3">
+              <div className="flex gap-2 items-start">
+                <AiIcon className="shrink-0" />
+                <p className="text-head text-gray-800">다시 생각해봐요</p>
+              </div>
+              {adviceLoading ? (
+                <p className="text-body1 text-gray-400">조언을 불러오는 중이에요...</p>
+              ) : (
+                <p className="text-body1 text-gray-800">{advice}</p>
+              )}
+            </Card>
+          )}
 
           {/* 가격 정보 */}
           {record.price > 0 && (
