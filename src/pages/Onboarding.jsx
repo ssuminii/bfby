@@ -33,6 +33,7 @@ export default function Onboarding() {
         <LinkInput
           showHeader
           onBack={isReturn ? undefined : () => setStep('category')}
+          hideBack={isReturn}
           onNext={(value) => {
             setLink(value)
             next()
