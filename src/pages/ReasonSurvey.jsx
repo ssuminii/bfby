@@ -38,6 +38,7 @@ export default function ReasonSurvey() {
       type: state?.type,
       choice,
       reason: answer,
+      reasonItems: state?.reasonItems ?? [],
     };
     const saved = saveDecision(record);
     // TODO: answer 를 서버로 보내기 (미정)
