@@ -12,6 +12,7 @@ export default function ReportActions({
   product,
   category,
   type,
+  reasonItems,
   note,
 }) {
   const navigate = useNavigate();
@@ -21,7 +22,7 @@ export default function ReportActions({
     // 중간에 뒤로 가면 기록에 남지 않아야 집계가 부풀지 않는다.
     if (REASON_SURVEY[key]) {
       navigate(`/report/reason/${key}`, {
-        state: { product, category, type, choice: key },
+        state: { product, category, type, choice: key, reasonItems },
       });
       return;
     }
@@ -34,6 +35,7 @@ export default function ReportActions({
       category,
       type,
       choice: key,
+      reasonItems,
     };
     const saved = saveDecision(record);
 

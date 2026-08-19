@@ -6,7 +6,7 @@ import OtherInput from "../components/reason/OtherInput";
 import ProductSummary from "../components/reason/ProductSummary";
 import ReasonOptions from "../components/reason/ReasonOptions";
 import { REASON_SURVEY } from "../constants/reasonSurvey";
-import { saveDecision } from "../utils/history";
+import { saveDecision, resolveHold } from "../utils/history";
 
 export default function ReasonSurvey() {
   const navigate = useNavigate();
@@ -30,16 +30,24 @@ export default function ReasonSurvey() {
 
   // 완료를 눌러야 비로소 결정으로 집계된다. 버튼을 누른 것만으로는 기록하지 않는다.
   const submit = () => {
-    const record = {
-      name: product?.name,
-      price: product?.price ?? 0,
-      image: product?.image ?? null,
-      category: state?.category,
-      type: state?.type,
-      choice,
-      reason: answer,
-    };
-    const saved = saveDecision(record);
+    // holdAt이 있으면 기존 hold 기록을 업데이트, 없으면 새 기록 생성
+    const holdAt = state?.holdAt;
+    let saved;
+    if (holdAt) {
+      saved = resolveHold(holdAt, choice) ?? { ...state, choice, reason: answer };
+    } else {
+      const record = {
+        name: product?.name,
+        price: product?.price ?? 0,
+        image: product?.image ?? null,
+        category: state?.category,
+        type: state?.type,
+        choice,
+        reason: answer,
+        reasonItems: state?.reasonItems ?? [],
+      };
+      saved = saveDecision(record);
+    }
     // TODO: answer 를 서버로 보내기 (미정)
     navigate("/report/card", { state: { record: saved, link: product?.link } });
   };
