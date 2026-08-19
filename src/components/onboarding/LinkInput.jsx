@@ -15,13 +15,13 @@ const isValidUrl = (value) => {
   return labels.length >= (labels[0].toLowerCase() === 'www' ? 3 : 2)
 }
 
-export default function LinkInput({ onNext, onBack }) {
+export default function LinkInput({ onNext, onBack, hideBack }) {
   const [link, setLink] = useState('')
   const invalid = link !== '' && !isValidUrl(link)
 
   return (
     <BottomSheetPage
-      header={<Header onBack={onBack} />}
+      header={<Header onBack={onBack} hideBack={hideBack} />}
       title={
         <>
           <p className='text-title font-bold text-gray-800 whitespace-nowrap'>
