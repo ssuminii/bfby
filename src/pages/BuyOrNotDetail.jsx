@@ -10,6 +10,7 @@ import ReasonList from '../components/report/ReasonList'
 import ConcernProductCard from '../components/buyornot/ConcernProductCard'
 import { REPORT_THEME } from '../constants/reportTheme'
 import { generateHoldAdvice } from '../utils/gemini'
+import fetchProductInfo from '../utils/fetchProductInfo'
 
 const ADVICE_CACHE_PREFIX = 'bfby.advice.'
 
@@ -31,6 +32,7 @@ export default function BuyOrNotDetail() {
   const record = state?.record
   const [advice, setAdvice] = useState(null)
   const [adviceLoading, setAdviceLoading] = useState(false)
+  const [currentPrice, setCurrentPrice] = useState(null)
 
   useEffect(() => {
     if (!record?.at) return
@@ -48,6 +50,13 @@ export default function BuyOrNotDetail() {
       })
       .finally(() => setAdviceLoading(false))
   }, [record?.at])
+
+  useEffect(() => {
+    if (!record?.link) return
+    fetchProductInfo(record.link).then((info) => {
+      if (info?.price != null) setCurrentPrice(info.price)
+    })
+  }, [record?.link])
 
   if (!record) return null
 
@@ -106,18 +115,34 @@ export default function BuyOrNotDetail() {
           )}
 
           {/* 가격 정보 */}
-          {record.price > 0 && (
-            <Card className="bg-white p-6 flex flex-col gap-3">
-              <div className="flex gap-2 items-start">
-                <AiIcon className="shrink-0" />
-                <p className="text-head text-gray-800">가격이 그대로예요</p>
-              </div>
-              <p className="text-body1 text-gray-800">
-                보관할 때와 같은 {record.price.toLocaleString()}원으로, 한 번 쓸 때마다 약{' '}
-                {Math.round(record.price / 30).toLocaleString()}원이 들어요.
-              </p>
-            </Card>
-          )}
+          {record.price > 0 && (() => {
+            const saved = record.price
+            const now = currentPrice
+            const diff = now != null ? now - saved : 0
+            const displayPrice = now ?? saved
+            const perUse = Math.round(displayPrice / 30)
+
+            let title = '가격이 그대로예요'
+            let body = `보관할 때와 같은 ${saved.toLocaleString()}원으로, 한 번 쓸 때마다 약 ${perUse.toLocaleString()}원이 들어요.`
+
+            if (now != null && diff < 0) {
+              title = '가격이 내려갔어요'
+              body = `처음 고민할 때보다 ${Math.abs(diff).toLocaleString()}원 내려간 가격이에요. 한 번 쓸 때마다 약 ${perUse.toLocaleString()}원이 들어요.`
+            } else if (now != null && diff > 0) {
+              title = '가격이 올랐어요'
+              body = `처음 고민할 때보다 ${diff.toLocaleString()}원 오른 가격이에요. 한 번 쓸 때마다 약 ${perUse.toLocaleString()}원이 들어요.`
+            }
+
+            return (
+              <Card className="bg-white p-6 flex flex-col gap-3">
+                <div className="flex gap-2 items-start">
+                  <AiIcon className="shrink-0" />
+                  <p className="text-head text-gray-800">{title}</p>
+                </div>
+                <p className="text-body1 text-gray-800">{body}</p>
+              </Card>
+            )
+          })()}
 
         </div>
       </div>
