@@ -18,3 +18,37 @@ export const KINDS = {
 };
 
 export const kindsOf = (category) => KINDS[category] ?? [];
+
+const bigrams = (text) => {
+  const chars = text.replace(/[\s·]/g, "");
+  return new Set(Array.from({ length: chars.length - 1 }, (_, i) => chars.slice(i, i + 2)));
+};
+
+/**
+ * 모델이 말한 소분류를 목록에 있는 이름으로 되돌린다.
+ *
+ * "집에 두고 쓰는 가전"처럼 한 글자씩 다르게 쓰거나 "화장품, 미용기기"처럼
+ * 둘을 함께 내놓는 일이 있다. 표기가 어긋나면 기록과 맞물리지 않아
+ * 견줄 게 있는데도 "이번이 처음이에요"가 나간다.
+ */
+export function normalizeKind(category, raw) {
+  const kinds = kindsOf(category);
+  const text = String(raw ?? "").trim();
+  if (!text) return null;
+
+  const exact = kinds.find((kind) => kind === text) ?? kinds.find((kind) => text.includes(kind));
+  if (exact) return exact;
+
+  // 글자가 가장 많이 겹치는 것으로 붙인다
+  const target = bigrams(text);
+  let best = null;
+  let bestScore = 0;
+  for (const kind of kinds) {
+    const score = [...bigrams(kind)].filter((gram) => target.has(gram)).length;
+    if (score > bestScore) {
+      best = kind;
+      bestScore = score;
+    }
+  }
+  return bestScore >= 2 ? best : null;
+}
