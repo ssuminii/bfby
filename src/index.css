@@ -288,8 +288,24 @@ body {
   animation: rise-in 520ms cubic-bezier(0.2, 0, 0.1, 1) both;
 }
 
+@keyframes chart-bar-rise {
+  from {
+    transform: scaleY(0);
+    opacity: 0.4;
+  }
+  to {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+@utility animate-chart-bar-rise {
+  animation: chart-bar-rise 700ms cubic-bezier(0.2, 0, 0.1, 1) both;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .animate-rise-in {
+  .animate-rise-in,
+  .animate-chart-bar-rise {
     animation: none;
   }
 }

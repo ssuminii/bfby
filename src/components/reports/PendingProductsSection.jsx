@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import stateBadImage from '../../assets/reports/state-bad.png'
 import stateBestImage from '../../assets/reports/state-best.png'
@@ -15,6 +15,7 @@ const CARD_WIDTH = 297
 const CARD_GAP = 12
 const ACTIVE_CARD_LEFT = 19
 const PLACEHOLDER_COUNT = 3
+const DRAG_THRESHOLD = 48
 
 const SATISFACTIONS = [
   { value: 'worst', label: '최악이에요', image: stateWorstImage, satisfied: false },
@@ -494,10 +495,20 @@ function GoodCompleteView({ record, onClose }) {
 export default function PendingProductsSection({ records, onResolveRecord }) {
   const [selectedRecord, setSelectedRecord] = useState(null)
   const [activeIndex, setActiveIndex] = useState(0)
+  const [dragOffset, setDragOffset] = useState(0)
+  const dragRef = useRef({ pointerId: null, startX: 0, moved: false })
+  const suppressClickRef = useRef(false)
+  const suppressClickTimerRef = useRef(null)
+  const removeDragListenersRef = useRef(null)
   const slides = useMemo(() => {
     if (records.length > 0) return records
     return Array.from({ length: PLACEHOLDER_COUNT }, () => null)
   }, [records])
+
+  useEffect(() => () => {
+    removeDragListenersRef.current?.()
+    window.clearTimeout(suppressClickTimerRef.current)
+  }, [])
 
   useEffect(() => {
     setActiveIndex(records.length > 1 ? 1 : 0)
@@ -512,7 +523,67 @@ export default function PendingProductsSection({ records, onResolveRecord }) {
     })
   }
 
-  const trackOffset = ACTIVE_CARD_LEFT - activeIndex * (CARD_WIDTH + CARD_GAP)
+  const handlePointerDown = (event) => {
+    if (slides.length <= 1 || event.button !== 0) return
+    removeDragListenersRef.current?.()
+    dragRef.current = { pointerId: event.pointerId, startX: event.clientX, moved: false }
+    window.addEventListener('pointermove', handlePointerMove)
+    window.addEventListener('pointerup', endDrag)
+    window.addEventListener('pointercancel', cancelDrag)
+    removeDragListenersRef.current = () => {
+      window.removeEventListener('pointermove', handlePointerMove)
+      window.removeEventListener('pointerup', endDrag)
+      window.removeEventListener('pointercancel', cancelDrag)
+      removeDragListenersRef.current = null
+    }
+  }
+
+  const handlePointerMove = (event) => {
+    if (dragRef.current.pointerId !== event.pointerId) return
+    const delta = event.clientX - dragRef.current.startX
+    const atStart = activeIndex === 0 && delta > 0
+    const atEnd = activeIndex === slides.length - 1 && delta < 0
+    const offset = atStart || atEnd ? delta * 0.35 : delta
+
+    if (Math.abs(delta) > 6) dragRef.current.moved = true
+    setDragOffset(offset)
+  }
+
+  const endDrag = (event) => {
+    if (dragRef.current.pointerId !== event.pointerId) return
+    const delta = event.clientX - dragRef.current.startX
+
+    if (dragRef.current.moved) {
+      suppressClickRef.current = true
+      window.clearTimeout(suppressClickTimerRef.current)
+      suppressClickTimerRef.current = window.setTimeout(() => {
+        suppressClickRef.current = false
+      }, 250)
+      if (Math.abs(delta) >= DRAG_THRESHOLD) {
+        moveSlide(delta < 0 ? 1 : -1)
+      }
+    }
+
+    dragRef.current = { pointerId: null, startX: 0, moved: false }
+    removeDragListenersRef.current?.()
+    setDragOffset(0)
+  }
+
+  const handleClickCapture = (event) => {
+    if (!suppressClickRef.current) return
+    event.preventDefault()
+    event.stopPropagation()
+    suppressClickRef.current = false
+    window.clearTimeout(suppressClickTimerRef.current)
+  }
+
+  const cancelDrag = () => {
+    dragRef.current = { pointerId: null, startX: 0, moved: false }
+    removeDragListenersRef.current?.()
+    setDragOffset(0)
+  }
+
+  const trackOffset = ACTIVE_CARD_LEFT - activeIndex * (CARD_WIDTH + CARD_GAP) + dragOffset
 
   return (
     <section className='border-t border-gray-100 px-6 py-10'>
@@ -525,9 +596,15 @@ export default function PendingProductsSection({ records, onResolveRecord }) {
         </p>
       </div>
 
-      <div className='relative mt-6 h-[226px] w-full overflow-hidden'>
+      <div
+        className='relative mt-6 h-[226px] w-full touch-pan-y overflow-hidden'
+        onPointerDown={handlePointerDown}
+        onClickCapture={handleClickCapture}
+      >
         <div
-          className='absolute left-0 top-0 flex items-start gap-3 transition-transform duration-300 ease-out'
+          className={`absolute left-0 top-0 flex items-start gap-3 ${
+            dragRef.current.pointerId === null ? 'transition-transform duration-300 ease-out' : ''
+          }`}
           style={{ transform: `translateX(${trackOffset}px)` }}
         >
           {slides.map((record, slideIndex) => (

@@ -21,6 +21,7 @@ function CardGridSection({
 
   const cards = useMemo(() => {
     if (expanded) return records
+    if (records.length <= PREVIEW_SIZE) return records
     const preview = records.slice(0, PREVIEW_SIZE)
     return [...preview, ...Array(Math.max(0, PREVIEW_SIZE - preview.length)).fill(null)]
   }, [expanded, records])
@@ -64,15 +65,17 @@ function CardGridSection({
         })}
       </div>
 
-      <div className='mt-6'>
-        <Button
-          variant='dark'
-          onClick={() => records.length > PREVIEW_SIZE && setExpanded((current) => !current)}
-          className='text-head'
-        >
-          {expanded ? '접기' : `전체 ${records.length}장 보기`}
-        </Button>
-      </div>
+      {records.length > PREVIEW_SIZE && (
+        <div className='mt-6'>
+          <Button
+            variant='dark'
+            onClick={() => setExpanded((current) => !current)}
+            className='text-head'
+          >
+            {expanded ? '접기' : `전체 ${records.length}장 보기`}
+          </Button>
+        </div>
+      )}
     </section>
   )
 }
