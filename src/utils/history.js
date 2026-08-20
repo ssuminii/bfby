@@ -137,10 +137,18 @@ const PRICE_BAND = 2
 export const withinPriceBand = (past, price) =>
   Boolean(past && price) && (past > price ? past / price : price / past) <= PRICE_BAND
 
-export function comparableRecords(history, category, price) {
+/**
+ * 지금 보는 상품과 나란히 놓을 만한 기록만 남긴다.
+ *
+ * 소분류를 아는 상품이면 소분류까지 같아야 한다. 정수기와 태블릿은 같은
+ * '전자기기'에 값도 비슷하고 매일 쓴다는 점도 같아서, 그것 말고는 갈라낼 길이 없다.
+ * 소분류가 없던 시절의 기록은 이 조건을 걸 수 없으니 카테고리까지만 본다.
+ */
+export function comparableRecords(history, category, price, kind = null) {
   const sameCategory = history.filter((record) => record.category === category)
-  if (!price) return sameCategory
-  return sameCategory.filter((record) => withinPriceBand(record.price ?? 0, price))
+  const sameKind = kind ? sameCategory.filter((record) => record.kind === kind) : sameCategory
+  if (!price) return sameKind
+  return sameKind.filter((record) => withinPriceBand(record.price ?? 0, price))
 }
 
 // 괄호 안 설명과 용량·색상 같은 스펙 꼬리표

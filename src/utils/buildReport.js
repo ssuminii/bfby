@@ -194,7 +194,9 @@ function pastStory(past, type, price, rhythm, now) {
 
 // 이 카테고리에서 사고 나서 어땠는지의 비율.
 // 판정과 같은 쪽을 센다. 추천 카드에 후회율을 붙이면 카드가 자기 결론을 깎아먹는다.
-function outcomeRatio(past, category, type) {
+function outcomeRatio(past, category, type, kind) {
+  // 소분류를 알면 그 이름으로 말해야 무엇을 센 숫자인지 보인다
+  const label = kind ? `${category} 중 ${kind}` : `${category} 카테고리`
   const answered = past.filter((r) => typeof r.checkin?.satisfied === 'boolean')
   if (answered.length < 2) return null
 
@@ -204,7 +206,7 @@ function outcomeRatio(past, category, type) {
   if (!hits) return null
 
   const tail = looksGood ? '만족**한다고' : '후회**된다고'
-  return `**${category} 카테고리**에서 평균적으로 **${answered.length}번 중 ${hits}번 꼴로 ${tail} 하셨어요.`
+  return `**${label}**에서 평균적으로 **${answered.length}번 중 ${hits}번 꼴로 ${tail} 하셨어요.`
 }
 
 // 지난 선택을 한마디로. 기록에 남은 사실만 쓴다.
@@ -238,18 +240,21 @@ function outcomeStory(comparable, type, price, rhythm, now) {
 }
 
 // 지나간 기록만으로 쓴다. 없는 이력을 지어내지 않으려고 AI를 거치지 않는다.
-function historyCard(history, category, price, type, rhythm, now = new Date()) {
-  const past = category ? history.filter((h) => h.category === category) : []
+function historyCard(history, category, price, type, rhythm, kind, now = new Date()) {
+  // 비율도 소분류 안에서 센다. 카테고리 전체로 세면 정수기 카드에 태블릿까지 섞인다.
+  const past = category
+    ? history.filter((h) => h.category === category && (!kind || h.kind === kind))
+    : []
 
   // 이야기는 값이 비슷한 기록에서만 끌어온다. 비율은 카테고리 전체로 세야 표본이 남는다.
-  const comparable = category ? comparableRecords(history, category, price) : []
+  const comparable = category ? comparableRecords(history, category, price, kind) : []
 
   // 값이 비슷한 기록이 있을 때만 카테고리 비율을 함께 붙인다.
   // 200만원 냉장고에 8만원짜리들로 낸 비율을 갖다 대면 숫자가 남의 것이 된다.
   const story =
     pastStory(comparable, type, price, rhythm, now) ??
     outcomeStory(comparable, type, price, rhythm, now)
-  const lines = [story, comparable.length && outcomeRatio(past, category, type)].filter(Boolean)
+  const lines = [story, comparable.length && outcomeRatio(past, category, type, kind)].filter(Boolean)
 
   // 들려줄 이야기가 없으면 앞으로 쌓일 거라고만 알린다
   if (!lines.length) {
@@ -257,7 +262,7 @@ function historyCard(history, category, price, type, rhythm, now = new Date()) {
       title: '내 기록',
       lines: [
         past.length
-          ? `${category} 중에 이만한 값을 보신 건 이번이 처음이에요.\n어떠셨는지 알려주시면 다음에 견줘서 알려드릴게요.`
+          ? `${kind ?? category} 중에 이만한 값을 보신 건 이번이 처음이에요.\n어떠셨는지 알려주시면 다음에 견줘서 알려드릴게요.`
           : '이 카테고리는 이번이 처음이에요.\n기록이 쌓이면 예전 선택과 견줘서 알려드릴게요.',
       ],
     }
@@ -277,7 +282,7 @@ export function buildReport(judgment, product, history = [], category = null) {
   const cards = [
     reasonCard(type, signals, judgment.reasons),
     judgment.usage && usageCard(judgment.usage, price),
-    historyCard(history, category, price, type, rhythm),
+    historyCard(history, category, price, type, rhythm, judgment.kind ?? null),
     // 살 만하다고 판단했으면 굳이 대여를 권하지 않는다
     type !== 'recommend' && judgment.tryFirst ? tryFirstCard(judgment.tryFirst, past.length > 0) : null,
   ].filter(Boolean)
