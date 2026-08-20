@@ -2,7 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import parseProduct from './parse-product.js'
 
-test('trailing comma가 있는 JSON-LD에서도 가격과 상품 태그를 추출한다', () => {
+test('trailing comma가 있는 JSON-LD에서도 가격을 추출하고 일반 정보는 태그로 쓰지 않는다', () => {
   const html = `
     <meta property="og:title" content="슈틸루스터 헤어스타일러">
     <meta property="og:image" content="https://example.com/product.jpg">
@@ -32,7 +32,37 @@ test('trailing comma가 있는 JSON-LD에서도 가격과 상품 태그를 추�
     name: '슈틸루스터 헤어스타일러',
     image: 'https://example.com/product.jpg',
     price: 219000,
-    tags: ['슈틸루스터', '재고 있음', '무료배송'],
+    tags: [],
+  })
+})
+
+test('구매 전 놓치기 쉬운 조건만 상품 태그로 추출한다', () => {
+  const html = `
+    <meta property="og:title" content="해외 한정판 스니커즈">
+    <meta property="og:image" content="https://example.com/shoes.jpg">
+    <meta name="description" content="해외 한정판 스니커즈, 교환/반품 불가 상품입니다.">
+    <script type="application/ld+json">
+      {
+        "@type": "Product",
+        "name": "해외 한정판 스니커즈",
+        "offers": {
+          "@type": "Offer",
+          "price": "129000",
+          "availability": "https://schema.org/LimitedAvailability",
+          "shippingDetails": {
+            "shippingRate": { "value": "3000", "currency": "KRW" },
+            "shippingOrigin": { "addressCountry": "US" }
+          }
+        }
+      }
+    </script>
+  `
+
+  assert.deepEqual(parseProduct(html), {
+    name: '해외 한정판 스니커즈',
+    image: 'https://example.com/shoes.jpg',
+    price: 129000,
+    tags: ['품절 임박', '반품 불가', '교환 불가', '배송비 별도', '해외 배송'],
   })
 })
 
