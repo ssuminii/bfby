@@ -147,6 +147,13 @@
   letter-spacing: -0.13px;
 }
 
+@utility text-emphasis {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: -0.14px;
+}
+
 @utility text-result {
   font-size: 14px;
   font-weight: 500;
