@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 
 export default function Splash({ onNext }) {
   useEffect(() => {
+    new Image().src = '/intro-character.png'
     const timer = setTimeout(onNext, 3000)
     return () => clearTimeout(timer)
   }, [onNext])
