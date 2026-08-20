@@ -5,7 +5,11 @@ import ChevronLeftIcon from '../icons/ChevronLeftIcon'
 const EXPIRY_DAYS = 7
 
 function daysSince(isoDate) {
-  return Math.floor((Date.now() - new Date(isoDate)) / (1000 * 60 * 60 * 24))
+  const saved = new Date(isoDate)
+  const today = new Date()
+  const savedDay = new Date(saved.getFullYear(), saved.getMonth(), saved.getDate())
+  const todayDay = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+  return Math.floor((todayDay - savedDay) / (1000 * 60 * 60 * 24))
 }
 
 export default function ConcernProductCard({
