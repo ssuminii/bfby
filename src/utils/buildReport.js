@@ -9,8 +9,7 @@
  * 숫자(점수·금액)는 전부 여기서 계산한다. AI는 재료만 준다.
  */
 
-import { scaleOf } from '../constants/savingScale.js'
-import { isSaving } from './history.js'
+
 
 // AI는 축별 좋음/주의/걸림만 판단하고, 최종 판정은 여기서 계산한다.
 // 축마다 무게가 달라서 걸림 개수만 세면 안 된다.
@@ -84,139 +83,120 @@ function usageCard(usage, price) {
   }
 }
 
-const tryFirstCard = (tryFirst) => ({
-  title: '이런 선택지도 있어요',
-  lead: tryFirst.lead,
-  lines: [tryFirst.note].filter(Boolean),
-})
+// 선택지는 여러 개일 수 있다. 예전 응답이 객체 하나였던 것도 받아준다.
+const tryFirstCard = (tryFirst, hasRecords) => {
+  const options = (Array.isArray(tryFirst) ? tryFirst : [tryFirst]).filter(
+    (option) => option?.lead,
+  )
+  if (!options.length) return null
 
-const sameMonth = (iso, now) => {
-  const d = new Date(iso)
-  return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth()
-}
-
-// "지금 안 사면 이렇게 된다"를 보여주는 카드라 before 〉 after 형태로 쓴다.
-function savingCard(price, history, now = new Date()) {
-  const skipped = history.filter(isSaving)
-  const total = skipped.reduce((sum, h) => sum + (h.price ?? 0), 0)
-  const month = skipped
-    .filter((h) => h.at && sameMonth(h.at, now))
-    .reduce((sum, h) => sum + (h.price ?? 0), 0)
-
-  const step = (before) => `${before.toLocaleString()}원 〉 ${(before + price).toLocaleString()}원`
-
-  // 이번에 아끼는 금액을 "무엇 몇 번 값"으로 환산
-  const tier = scaleOf(price)
-  const times = Math.max(1, Math.round(price / tier.unit))
-
-  // 누적이 닿는 지점은 한 단계 위 목표가 되므로 따로 알려준다
-  const reached = scaleOf(total + price)
-
+  // 참고할 기록이 있었을 때만 출처를 밝힌다. 없으면 일반적인 제안일 뿐이다.
   return {
-    title: '구매하지 않으면 아끼게 되는 비용',
-    amount: won(price),
-    tag: `${tier.label} ${times}${tier.counter} 값이에요`,
-    footnotes: [`이번 달 절약 ${step(month)}`, `누적 ${step(total)} (${reached.label}까지)`],
+    title: '이런 선택지도 있어요',
+    options,
+    ...(hasRecords && { tag: '내 기록 기반' }),
   }
 }
 
-// 체크인 만족 비율로 이 카테고리의 판단 성향을 한 줄로 말해준다
-const CHECKIN_VERDICT = [
-  { min: 0.7, line: '이 카테고리는 판단이 잘 맞는 편이에요.' },
-  { min: 0.4, line: '이 카테고리는 만족과 아쉬움이 반반이었어요.' },
-  { min: 0, line: '이 카테고리는 사고 나서 아쉬우셨던 적이 많았어요.' },
-]
+// 세는 말은 숫자보다 우리말이 눈에 잘 들어온다
+const COUNT_WORDS = ['', '한', '두', '세', '네', '다섯', '여섯', '일곱', '여덟', '아홉', '열']
+const countWord = (n) => COUNT_WORDS[n] ?? String(n)
 
-// 리포트 화면에서 누른 버튼이다. 실제로 샀는지는 체크인 전까지 알 수 없다.
-const CHOICE_LABEL = {
-  skip: '안 사기로',
-  buy: '사기로',
-  hold: '더 고민해보기로',
+
+// "3월에", "지난달에"처럼 문장에 그대로 끼울 수 있는 형태로 만든다
+function whenLabel(iso, now) {
+  const date = new Date(iso)
+  if (Number.isNaN(date.getTime())) return null
+
+  const months =
+    (now.getFullYear() - date.getFullYear()) * 12 + (now.getMonth() - date.getMonth())
+
+  if (months <= 0) return '이번 달에'
+  if (months === 1) return '지난달에'
+  if (months < 12) return `${date.getMonth() + 1}월에`
+  return `작년 ${date.getMonth() + 1}월에`
 }
 
-// 0번짜리 문구가 나오지 않게 실제로 있었던 선택만 센다
-function pastChoices(past) {
-  const made = Object.entries(CHOICE_LABEL)
-    .map(([choice, label]) => [past.filter((h) => h.choice === choice).length, label])
-    .filter(([n]) => n)
+// 구매하고 체크인까지 걸린 기간
+function gapLabel(record) {
+  const bought = new Date(record.at)
+  const checked = new Date(record.checkin?.at ?? '')
+  if (Number.isNaN(checked.getTime())) return '얼마 뒤'
 
-  if (made.length === 1) {
-    const [, label] = made[0]
-    return past.length === 1
-      ? `지난 1번은 ${label} 하셨어요.`
-      : `지난 ${past.length}번은 모두 ${label} 하셨어요.`
-  }
-
-  const parts = made.map(([n, label]) => `${n}번은 ${label}`).join(', ')
-  return `지난 ${past.length}번 중 ${parts} 하셨어요.`
+  const months = Math.max(
+    1,
+    (checked.getFullYear() - bought.getFullYear()) * 12 + (checked.getMonth() - bought.getMonth()),
+  )
+  return months <= 3 ? `${countWord(months)} 달 뒤엔` : `${months}개월 뒤엔`
 }
 
-// 체크인은 '더 고민할게요'로 미뤄둔 건에만 붙는다.
-// 안 사기로·사기로 한 건 그 자리에서 결정이 끝나서 다시 묻지 않는다.
-function checkinLines(past) {
-  const resolved = past.filter((h) => h.choice === 'hold' && h.checkin)
-  if (!resolved.length) return []
+/**
+ * 가장 도움이 될 지난 기록 한 건을 문장으로 만든다.
+ *
+ * 그때 뭐라고 답했는지와 나중에 어떻게 됐는지가 모두 있어야 이야기가 된다.
+ * 둘 중 하나라도 없으면 "예전에 비슷한 걸 사셨어요" 수준이 되어 도움이 안 된다.
+ */
+function pastStory(past, now) {
+  const told = past.filter((r) => r.usageAnswer && r.checkin?.usage)
+  if (!told.length) return null
 
-  const bought = resolved.filter((h) => h.checkin.resolved === 'buy')
+  // 아쉬웠던 기록이 더 도움이 된다. 없으면 가장 최근 것을 쓴다.
+  const pick = told.find((r) => r.checkin.satisfied === false) ?? told[told.length - 1]
 
-  if (!bought.length) {
-    return [`고민하셨던 ${resolved.length}번은 결국 사지 않으셨어요.`]
-  }
+  // 답변은 그대로 인용한다. 어미를 바꾸려 들면 문장이 깨지고, 고친 말은 그 사람 말이 아니다.
+  // '하셨는데'로 이어야 기대와 결과가 어긋났다는 게 읽힌다.
+  return (
+    `${whenLabel(pick.at, now)} 보셨던 ${pick.name}도\n` +
+    `**'${pick.usageAnswer}'**라고 하셨는데,\n` +
+    `${gapLabel(pick)} **'${pick.checkin.usage}'**라고 답하셨어요.`
+  )
+}
 
-  const good = bought.filter((h) => h.checkin.satisfied).length
-  const how =
-    good === bought.length
-      ? `${bought.length}번 모두 '만족스러워요'`
-      : good === 0
-        ? `${bought.length}번 모두 '아쉬워요'`
-        : `${bought.length}번 중 ${good}번은 '만족스러워요'`
+// 이 카테고리에서 사고 나서 후회한 비율
+function regretRatio(past, category) {
+  const answered = past.filter((r) => typeof r.checkin?.satisfied === 'boolean')
+  if (answered.length < 2) return null
 
-  const head =
-    bought.length === resolved.length
-      ? `고민하셨던 ${resolved.length}번은 결국 다 사셨어요.`
-      : `고민하셨던 ${resolved.length}번 중 ${bought.length}번은 결국 사셨어요.`
+  const regret = answered.filter((r) => !r.checkin.satisfied).length
+  // 후회한 적이 없으면 굳이 꺼낼 말이 아니다
+  if (!regret) return null
 
-  return [
-    `${head}\n${how}라고 답하셨어요.`,
-    CHECKIN_VERDICT.find((v) => good / bought.length >= v.min).line,
-  ]
+  return `**${category} 카테고리**에서 평균적으로 **${answered.length}번 중 ${regret}번 꼴로 후회**된다고 하셨어요.`
 }
 
 // 지나간 기록만으로 쓴다. 없는 이력을 지어내지 않으려고 AI를 거치지 않는다.
-function historyCard(history, category) {
+function historyCard(history, category, now = new Date()) {
   const past = category ? history.filter((h) => h.category === category) : []
-  const count = past.length + 1 // 지금 보고 계신 이번 판단까지 포함
-  const lead = category ? `${category} 카테고리에서` : '지금까지'
-  const checkin = checkinLines(past)
 
-  return {
-    title: '내 기록',
-    lines: [
-      [`${lead} 지금까지 ${count}번 판단하셨어요.`, past.length && pastChoices(past)]
-        .filter(Boolean)
-        .join('\n'),
-      ...(checkin.length
-        ? checkin
-        : [
-            '더 고민할게요를 고르시면 얼마 뒤에 그 물건을 어떻게 하셨는지 여쭤볼게요.\n답이 쌓이면 이 카테고리에서 어떤 선택이 잘 맞았는지 알려드릴 수 있어요.',
-          ]),
-    ],
-    ...(past.length && { tag: '내 기록 기반' }),
+  const lines = [pastStory(past, now), regretRatio(past, category)].filter(Boolean)
+
+  // 들려줄 이야기가 없으면 앞으로 쌓일 거라고만 알린다
+  if (!lines.length) {
+    return {
+      title: '내 기록',
+      lines: [
+        past.length
+          ? `${category}는 지금까지 ${past.length}번 판단하셨어요.\n사고 나서 어떠셨는지 알려주시면 다음 조언에 반영할게요.`
+          : '이 카테고리는 이번이 처음이에요.\n기록이 쌓이면 예전 선택과 견줘서 알려드릴게요.',
+      ],
+    }
   }
+
+  return { title: '내 기록', lines, tag: '내 기록 기반' }
 }
 
 export function buildReport(judgment, product, history = [], category = null) {
   const price = product?.price ?? 0
   const signals = judgment.signals ?? []
   const type = signals.length ? verdictOf(signals) : 'hold'
+  const past = category ? history.filter((record) => record.category === category) : []
 
   const cards = [
     reasonCard(type, signals, judgment.reasons),
     judgment.usage && usageCard(judgment.usage, price),
     historyCard(history, category),
     // 살 만하다고 판단했으면 굳이 대여를 권하지 않는다
-    type !== 'recommend' && judgment.tryFirst ? tryFirstCard(judgment.tryFirst) : null,
-    type !== 'recommend' && price ? savingCard(price, history) : null,
+    type !== 'recommend' && judgment.tryFirst ? tryFirstCard(judgment.tryFirst, past.length > 0) : null,
   ].filter(Boolean)
 
   return {
