@@ -1,11 +1,11 @@
-import Muted from "./Muted";
-
-// 큰 금액 + 바로 아래 붙는 산출 근거
+// 산출 근거를 먼저 보여주고 그 결과로 금액이 따라온다
 export default function Amount({ value, formula }) {
   return (
-    <div className="w-full flex flex-col gap-2">
-      <p className="text-display text-gray-800">{value}</p>
-      {formula && <Muted>{formula}</Muted>}
+    <div className='flex w-full flex-col gap-3'>
+      {formula && (
+        <p className='whitespace-pre-line text-body2 font-semibold text-gray-500'>{formula}</p>
+      )}
+      <p className='text-display text-gray-800'>{value}</p>
     </div>
-  );
+  )
 }

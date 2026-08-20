@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { useNavigate } from 'react-router-dom'
 import stateBadImage from '../../assets/reports/state-bad.png'
 import stateBestImage from '../../assets/reports/state-best.png'
 import stateOkayImage from '../../assets/reports/state-okay.png'
@@ -7,6 +8,7 @@ import stateWorstImage from '../../assets/reports/state-worst.png'
 import slideChevronIcon from '../../assets/reports/slide-chevron.svg'
 import { tierOf } from '../../constants/cardTier'
 import { resolveHold } from '../../utils/history'
+import { withViewTransition } from '../../utils/viewTransition'
 import ChevronLeftIcon from '../icons/ChevronLeftIcon'
 import SpendingCard from './SpendingCard'
 
@@ -172,9 +174,13 @@ function PendingCheckinSheet({ record, onClose, onResolve }) {
     closeAfterResolve({ resolved: 'skip', reason })
   }
 
+  // body에 띄우면 393px 폰 프레임을 벗어나 브라우저 창 전체를 덮는다.
+  // 프레임 안에 붙여야 화면 밖으로 새지 않는다.
+  const frame = document.getElementById('app-frame')
+
   return createPortal(
     <div
-      className={`fixed inset-0 z-50 flex justify-center ${
+      className={`absolute inset-0 z-50 flex justify-center ${
         completion ? 'items-stretch bg-white' : 'items-end bg-black/50'
       }`}
       role='presentation'
@@ -289,7 +295,7 @@ function PendingCheckinSheet({ record, onClose, onResolve }) {
         </div>
       )}
     </div>,
-    document.body
+    frame ?? document.body
   )
 }
 
@@ -451,7 +457,16 @@ function GoodRevealView() {
 }
 
 function GoodCompleteView({ record, onClose }) {
+  const navigate = useNavigate()
   const tier = tierOf(record.price ?? 0)
+
+  // 모달을 닫는 것만으로는 목록이 이 카드를 도착점으로 잡을 수 없다.
+  // 같은 경로로 다시 들어가 justAdded를 넘겨야 전환이 이어진다.
+  const goToVault = () =>
+    withViewTransition(() => {
+      onClose()
+      navigate('/reports', { replace: true, state: { justAdded: record.at } })
+    })
 
   return (
     <div
@@ -476,13 +491,17 @@ function GoodCompleteView({ record, onClose }) {
         >
           합리적인 소비 카드를{'\n'}습득했어요!
         </p>
-        <SpendingCard record={record} size='lg' />
+        {/* 떠 있는 움직임은 바깥 래퍼가 맡는다. 카드 자체에 걸면
+            보관함으로 넘어갈 때 전환 스냅샷에 기울기가 그대로 찍힌다 */}
+        <div className='animate-float'>
+          <SpendingCard record={record} size='lg' transitionName='acquired-card' />
+        </div>
         <p className='min-w-full text-center text-bodyb text-gray-500'>만족하셨다니 다행이에요.</p>
       </div>
 
       <button
         type='button'
-        onClick={onClose}
+        onClick={goToVault}
         className='absolute bottom-10 left-1/2 flex h-[52px] w-[345px] -translate-x-1/2 items-center justify-center rounded-xl bg-gray-800 text-head text-white'
       >
         카드보관함으로 이동

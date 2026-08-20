@@ -6,6 +6,7 @@ import ReportActions from "../components/report/ReportActions";
 import Verdict from "../components/report/Verdict";
 import { REPORT_THEME } from "../constants/reportTheme";
 import { buildReport } from "../utils/buildReport";
+import { MOCK_HISTORY } from "../mocks/history";
 import { loadHistory } from "../utils/history";
 
 export default function Report() {
@@ -18,33 +19,44 @@ export default function Report() {
   const report = buildReport(
     state.judgment,
     state.product,
-    loadHistory(),
+    // 보관함과 같은 기록을 봐야 한다. 여기만 실제 기록만 쓰면 지난 선택과 견줄 수 없다.
+    // TODO: 기록이 쌓이면 MOCK_HISTORY 제거
+    [...MOCK_HISTORY, ...loadHistory()],
     state.category,
   );
   const theme = REPORT_THEME[report.type];
   const usage = report.cards.find((card) =>
     card.title.startsWith("한 번 사용할 때"),
   );
+  // 나중에 내 기록 카드가 "그때 이렇게 답하셨는데" 라고 말하려면 이 답변이 필요하다
+  const usageAnswer = state.judgment.signals?.find(
+    (signal) => signal.axis === "얼마나 쓸까",
+  )?.answer;
 
   return (
     <div className="flex h-full flex-col bg-white">
       <Header title="상담 결과" />
       <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
         <div className="min-h-full" style={{ background: theme.gradient }}>
-          <div className="flex flex-col items-center px-6 pb-10">
-            <GaugeChart value={report.score} className="mt-20" />
-            <Verdict
-              title={theme.title}
-              subtitle={report.subtitle ?? theme.subtitle}
-            />
+          {/* 게이지·판정 / 카드 / 버튼을 같은 간격으로 떨어뜨린다 */}
+          <div className="flex flex-col gap-9 px-6 pb-10 pt-14">
+            <div className="flex flex-col items-center gap-[46px]">
+              <GaugeChart value={report.score} />
+              <Verdict
+                title={theme.title}
+                subtitle={report.subtitle ?? theme.subtitle}
+              />
+            </div>
+
             <CardList cards={report.cards} />
+
             <ReportActions
               actions={theme.actions}
               saving={report.saving}
               product={state.product}
               category={state.category}
               type={report.type}
-              reasonItems={report.cards[0]?.items ?? []}
+              usageAnswer={usageAnswer}
               note={
                 usage &&
                 `한 번 사용할 때마다 ${usage.amount} 정도의 비용이에요.`

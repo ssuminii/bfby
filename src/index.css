@@ -6,7 +6,7 @@
   --color-blue-100: #d6e6ff;
   --color-blue-300: #7fb0ff;
   --color-blue-500: #2f80ff;
-  --color-blue-600: #1f8ae0;
+  --color-blue-600: #1f6ae0;
   --color-blue-700: #164fad;
 
   /* Neutral */
@@ -138,6 +138,27 @@
   font-weight: 500;
   line-height: 1.5;
   letter-spacing: -0.13px;
+}
+
+@utility text-body2b {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: -0.13px;
+}
+
+@utility text-emphasis {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: -0.14px;
+}
+
+@utility text-result {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: -0.14px;
 }
 
 @utility text-bodyb {

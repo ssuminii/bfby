@@ -1,7 +1,10 @@
-export default function CardTitle({ children }) {
+import CardIcon from './CardIcon'
+
+export default function CardTitle({ icon, children }) {
   return (
-    <p className="text-head font-bold text-gray-800 tracking-tight-2">
-      {children}
-    </p>
-  );
+    <div className='flex items-center gap-2'>
+      <CardIcon name={icon} />
+      <p className='text-head text-gray-800'>{children}</p>
+    </div>
+  )
 }

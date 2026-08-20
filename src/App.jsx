@@ -20,7 +20,10 @@ function App() {
   return (
     <BrowserRouter>
       <div className="min-h-dvh bg-gray-100 flex items-center justify-center">
-        <div className="w-[393px] max-w-full h-dvh bg-white relative overflow-hidden">
+        <div
+          id="app-frame"
+          className="w-[393px] max-w-full h-dvh bg-white relative overflow-hidden"
+        >
           <div className="h-full">
             <Routes>
               <Route path="/" element={<Onboarding />} />

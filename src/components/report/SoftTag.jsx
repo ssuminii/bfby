@@ -1,9 +1,5 @@
-import Tag from "../Tag";
+import Chip from '../Chip'
 
 export default function SoftTag({ children }) {
-  return (
-    <Tag bg="bg-blue-50" text="text-blue-500">
-      {children}
-    </Tag>
-  );
+  return <Chip>{children}</Chip>
 }
