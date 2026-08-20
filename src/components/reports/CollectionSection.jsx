@@ -1,11 +1,12 @@
 import { useLayoutEffect, useMemo, useRef, useState } from 'react'
 import Button from '../Button'
 import ConsumptionToggle from './ConsumptionToggle'
+import PendingCard from './PendingCard'
 import SpendingCard from './SpendingCard'
 
 const PREVIEW_SIZE = 6
 
-export default function CollectionSection({ collections, justAdded }) {
+export default function CollectionSection({ collections, pending, justAdded }) {
   // 절약 카드를 담고 왔으면 그 탭이 열려 있어야 카드가 안착할 자리가 보인다
   const [mode, setMode] = useState(() =>
     justAdded && !collections.good.some((record) => record.at === justAdded) ? 'saving' : 'good',
@@ -65,6 +66,10 @@ export default function CollectionSection({ collections, justAdded }) {
         >
           {expanded ? '접기' : `전체 ${records.length}장 보기`}
         </Button>
+      </div>
+
+      <div className='mt-6'>
+        <PendingCard records={pending} />
       </div>
     </section>
   )

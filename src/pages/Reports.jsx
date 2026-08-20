@@ -7,6 +7,7 @@ import SavingsOverview from "../components/reports/SavingsOverview";
 import { loadHistory } from "../utils/history";
 import { MOCK_HISTORY } from "../mocks/history";
 import {
+  pendingDecisions,
   reportHistorySummary,
   spendingCollections,
 } from "../utils/reportHistory";
@@ -16,6 +17,7 @@ export default function Reports() {
   const [history] = useState(() => [...MOCK_HISTORY, ...loadHistory()]);
   const summary = useMemo(() => reportHistorySummary(history), [history]);
   const collections = useMemo(() => spendingCollections(history), [history]);
+  const pending = useMemo(() => pendingDecisions(history), [history]);
 
   return (
     <div className="flex h-full flex-col bg-white">
@@ -25,6 +27,7 @@ export default function Reports() {
         <div className="mx-6 border-t border-gray-100" />
         <CollectionSection
           collections={collections}
+          pending={pending}
           justAdded={state?.justAdded}
         />
       </main>
