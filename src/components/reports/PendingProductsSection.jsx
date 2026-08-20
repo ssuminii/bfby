@@ -14,7 +14,6 @@ const DAY = 24 * 60 * 60 * 1000
 const CARD_WIDTH = 297
 const CARD_GAP = 12
 const ACTIVE_CARD_LEFT = 19
-const PLACEHOLDER_COUNT = 3
 const DRAG_THRESHOLD = 48
 
 const SATISFACTIONS = [
@@ -144,7 +143,7 @@ function PendingCheckinSheet({ record, onClose, onResolve }) {
   }, [completion])
 
   const resolveRecord = (checkin) => {
-    const updated = resolveHold(record.at, checkin) ?? { ...record, checkin }
+    const updated = resolveHold(record.at, checkin, {}, record) ?? { ...record, checkin }
     onResolve(updated)
     return updated
   }
@@ -501,8 +500,7 @@ export default function PendingProductsSection({ records, onResolveRecord }) {
   const suppressClickTimerRef = useRef(null)
   const removeDragListenersRef = useRef(null)
   const slides = useMemo(() => {
-    if (records.length > 0) return records
-    return Array.from({ length: PLACEHOLDER_COUNT }, () => null)
+    return records
   }, [records])
 
   useEffect(() => () => {
@@ -584,6 +582,10 @@ export default function PendingProductsSection({ records, onResolveRecord }) {
   }
 
   const trackOffset = ACTIVE_CARD_LEFT - activeIndex * (CARD_WIDTH + CARD_GAP) + dragOffset
+
+  if (records.length === 0) {
+    return null
+  }
 
   return (
     <section className='border-t border-gray-100 px-6 py-10'>

@@ -24,10 +24,14 @@ const KEY = 'bfby.decisions'
  */
 // 그 자리에서 정했든, 살래말래에서 뒤늦게 정했든 결과는 같다
 const endedUpNotBuying = (record) =>
-  record.choice === 'skip' || record.checkin?.resolved === 'skip'
+  record.checkin?.resolved
+    ? record.checkin.resolved === 'skip'
+    : record.choice === 'skip'
 
 const endedUpBuying = (record) =>
-  record.choice === 'buy' || record.checkin?.resolved === 'buy'
+  record.checkin?.resolved
+    ? record.checkin.resolved === 'buy'
+    : record.choice === 'buy'
 
 export const isSaving = (record) =>
   endedUpNotBuying(record) && record.type !== 'recommend'
@@ -79,6 +83,15 @@ export function loadHistory() {
 }
 
 // at을 여기서 붙이므로, 저장된 모습 그대로를 돌려줘야 호출부가 같은 기록을 가리킬 수 있다
+export function mergeHistory(baseHistory, savedHistory) {
+  const savedByAt = new Map(savedHistory.map((record) => [record.at, record]))
+  const mergedBase = baseHistory.map((record) => savedByAt.get(record.at) ?? record)
+  const baseAts = new Set(baseHistory.map((record) => record.at))
+  const savedOnly = savedHistory.filter((record) => !baseAts.has(record.at))
+
+  return [...mergedBase, ...savedOnly]
+}
+
 export function saveDecision(record) {
   const saved = { ...record, at: new Date().toISOString() }
   try {
@@ -90,18 +103,27 @@ export function saveDecision(record) {
 }
 
 // 보류 카드 기록에 최종 결정(checkin)을 붙인다. at으로 레코드를 특정한다.
-export function resolveHold(at, resolved, checkin = {}) {
+export function resolveHold(at, resolved, checkin = {}, baseRecord = null) {
   try {
     const history = loadHistory()
     const nextCheckin =
       typeof resolved === 'object' ? resolved : { resolved, ...checkin }
-    const updated = history.map((r) =>
-      r.at === at && (r.choice === 'hold' || isPendingCard(r))
-        ? { ...r, checkin: nextCheckin }
-        : r
-    )
-    localStorage.setItem(KEY, JSON.stringify(updated))
-    return updated.find((r) => r.at === at) ?? null
+    let matched = false
+    const updated = history.map((r) => {
+      if (r.at === at) {
+        matched = true
+        return { ...r, checkin: nextCheckin }
+      }
+
+      return r
+    })
+    const next =
+      matched || !baseRecord
+        ? updated
+        : [...updated, { ...baseRecord, checkin: nextCheckin }]
+
+    localStorage.setItem(KEY, JSON.stringify(next))
+    return next.find((r) => r.at === at) ?? null
   } catch {
     return null
   }
