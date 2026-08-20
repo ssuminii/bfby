@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 @theme {
   /* Primary */
@@ -12,6 +12,7 @@
   /* Neutral */
   --color-gray-50: #f7f8fa;
   --color-gray-100: #edeff2;
+  --color-gray-200: #dadde2;
   --color-gray-300: #c6cbd2;
   --color-gray-400: #a9aeb6;
   --color-gray-500: #8b909a;
@@ -47,7 +48,7 @@
   --color-hero-end: #2f6bff;
 
   /* Font */
-  --font-suit: 'SUIT', sans-serif;
+  --font-suit: "SUIT", sans-serif;
 }
 
 /* Gradients */
@@ -56,11 +57,20 @@
 }
 
 @utility bg-report-summary-gradient {
-  background: linear-gradient(to bottom, #ffffff 10%, #e9f2ff 50%, #ffffff 100%);
+  background: linear-gradient(
+    to bottom,
+    #ffffff 10%,
+    #e9f2ff 50%,
+    #ffffff 100%
+  );
 }
 
 @utility bg-report-chart-gradient {
-  background: linear-gradient(to top, var(--color-blue-300), var(--color-blue-500));
+  background: linear-gradient(
+    to top,
+    var(--color-blue-300),
+    var(--color-blue-500)
+  );
 }
 
 @utility bg-report-pending-gradient {
@@ -152,7 +162,8 @@
      그 폭을 그대로 깎아먹는다. 얇은 반투명 막대로 존재만 남긴다. */
   * {
     scrollbar-width: thin;
-    scrollbar-color: color-mix(in srgb, var(--color-gray-500) 35%, transparent) transparent;
+    scrollbar-color: color-mix(in srgb, var(--color-gray-500) 35%, transparent)
+      transparent;
   }
 
   *::-webkit-scrollbar {
@@ -165,17 +176,25 @@
   }
 
   *::-webkit-scrollbar-thumb {
-    background-color: color-mix(in srgb, var(--color-gray-500) 35%, transparent);
+    background-color: color-mix(
+      in srgb,
+      var(--color-gray-500) 35%,
+      transparent
+    );
     border-radius: 100px;
   }
 
   *::-webkit-scrollbar-thumb:hover {
-    background-color: color-mix(in srgb, var(--color-gray-500) 55%, transparent);
+    background-color: color-mix(
+      in srgb,
+      var(--color-gray-500) 55%,
+      transparent
+    );
   }
 }
 
 body {
-  font-family: 'SUIT', sans-serif;
+  font-family: "SUIT", sans-serif;
   background-color: #f7f8fa;
   min-height: 100vh;
   display: flex;
@@ -241,6 +260,48 @@ body {
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-old(acquired-card),
   ::view-transition-new(acquired-card) {
+    animation: none;
+  }
+}
+
+/* 아래에서 살짝 올라오며 나타난다 */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@utility animate-rise-in {
+  animation: rise-in 520ms cubic-bezier(0.2, 0, 0.1, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-rise-in {
+    animation: none;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@utility animate-float {
+  animation: float 2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float {
     animation: none;
   }
 }

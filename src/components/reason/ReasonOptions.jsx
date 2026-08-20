@@ -1,10 +1,9 @@
-import { REASON_OPTIONS } from "../../constants/reasonSurvey";
 import ReasonOption from "./ReasonOption";
 
-export default function ReasonOptions({ selected, onSelect }) {
+export default function ReasonOptions({ options, selected, onSelect }) {
   return (
-    <div className="flex flex-col gap-3">
-      {REASON_OPTIONS.map((label) => (
+    <div className="flex flex-col gap-4">
+      {options.map((label) => (
         <ReasonOption
           key={label}
           label={label}

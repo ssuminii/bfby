@@ -45,15 +45,22 @@ export const isGoodSpending = (record) =>
   record.choice === 'buy' && record.type === 'recommend'
 
 /**
+ * 말렸는데도 산 경우. 잘한 소비인지 아직 알 수 없어 카드 발급을 미뤄 둔다.
+ * 체크인에서 만족도를 듣고 나서야 카드가 정해진다.
+ */
+export const isPendingCard = (record) =>
+  record.choice === 'buy' && record.type !== 'recommend' && !record.checkin
+
+/**
  * 이번 결정으로 어떤 카드를 얻는지 판별한다. 얻는 카드가 없으면 null.
  *
- * 추천을 받고도 안 샀거나, 말렸는데 그래도 산 경우는 카드가 없다.
+ * 더 고민할게요는 결정 자체를 미룬 것이라 카드가 아니라 살래말래 탭으로 간다.
  */
 export const cardKindOf = (record) => {
   if (isGoodSpending(record)) return 'good'
   if (isSaving(record)) return 'saving'
   if (record.checkin?.resolved === 'buy') return 'good'
-  if (record.choice === 'hold') return 'pending'
+  if (isPendingCard(record)) return 'pending'
   return null
 }
 

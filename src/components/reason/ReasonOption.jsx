@@ -3,7 +3,7 @@ export default function ReasonOption({ label, selected, onSelect }) {
     <button
       type="button"
       onClick={onSelect}
-      className={`flex items-center justify-between h-[50px] shrink-0 px-4 rounded-2xl
+      className={`flex items-center justify-between h-[50px] shrink-0 px-6 rounded-2xl
         border-2 transition-colors text-left
         ${selected ? "bg-blue-50 border-blue-300" : "bg-gray-50 border-transparent"}`}
     >

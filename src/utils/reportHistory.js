@@ -1,4 +1,4 @@
-import { isGoodSpending, isSaving, totalSaved } from './history.js'
+import { isGoodSpending, isPendingCard, isSaving, totalSaved } from './history.js'
 
 const byNewest = (a, b) => new Date(b.at).getTime() - new Date(a.at).getTime()
 
@@ -51,7 +51,6 @@ export const spendingCollections = (history) => ({
   saving: history.filter(isSaving).sort(byNewest),
 })
 
+// 카드 발급이 미뤄진 것들. 체크인에서 만족도를 들어야 카드가 정해진다.
 export const pendingDecisions = (history) =>
-  history
-    .filter((record) => record.choice === 'hold' && !record.checkin)
-    .sort(byNewest)
+  history.filter(isPendingCard).sort(byNewest)
