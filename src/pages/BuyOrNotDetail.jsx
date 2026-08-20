@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Card from "../components/Card";
-import Tag from "../components/Tag";
+import Chip from "../components/Chip";
 import Button from "../components/Button";
 import NavBar from "../components/NavBar";
 import AiIcon from "../components/icons/AiIcon";
@@ -20,10 +20,11 @@ const REASON_SECTION_TITLE = {
   avoid: "추천하지 않았던 이유",
 };
 
-const ANSWER_TAG = {
-  recommend: { bg: "bg-blue-100", text: "text-[#1f6ae0]" },
-  hold: { bg: "bg-[#fff4db]", text: "text-caution" },
-  avoid: { bg: "bg-[#fff4db]", text: "text-caution" },
+// 리포트와 같은 칩을 쓴다. 판정에 따라 색만 갈린다.
+const ANSWER_TONE = {
+  recommend: "info",
+  hold: "caution",
+  avoid: "caution",
 };
 
 export default function BuyOrNotDetail() {
@@ -67,7 +68,7 @@ export default function BuyOrNotDetail() {
 
   const type = record.type ?? "hold";
   const gradient = REPORT_THEME[type]?.gradient ?? REPORT_THEME.hold.gradient;
-  const answerTag = ANSWER_TAG[type] ?? ANSWER_TAG.hold;
+  const answerTone = ANSWER_TONE[type] ?? "caution";
   const reasonTitle = REASON_SECTION_TITLE[type];
 
   return (
@@ -86,14 +87,7 @@ export default function BuyOrNotDetail() {
             <Card className="bg-white p-6 flex flex-col gap-3">
               <p className="text-head text-gray-800">그 때 이렇게 답하셨어요</p>
               <div className="flex flex-wrap gap-2">
-                <Tag
-                  bg={answerTag.bg}
-                  text={answerTag.text}
-                  weight="font-bold"
-                  className="h-7 px-3"
-                >
-                  {record.reason}
-                </Tag>
+                <Chip tone={answerTone}>{record.reason}</Chip>
               </div>
             </Card>
           )}
