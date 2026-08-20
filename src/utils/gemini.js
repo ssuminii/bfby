@@ -1,8 +1,16 @@
 import { GoogleGenAI } from '@google/genai'
 
-const ai = new GoogleGenAI({
-  apiKey: import.meta.env.VITE_GEMINI_API_KEY,
-})
+let ai = null
+
+function getAi() {
+  const apiKey = import.meta.env.VITE_GEMINI_API_KEY
+  if (!apiKey) {
+    throw new Error('VITE_GEMINI_API_KEY가 설정되어 있지 않습니다.')
+  }
+
+  ai ??= new GoogleGenAI({ apiKey })
+  return ai
+}
 
 const AXES = ['이미 있나', '얼마나 쓸까', '왜 하필 지금', '예산이 감당되는가']
 
@@ -16,7 +24,7 @@ const TYPE_LABEL = {
 
 export async function generateHoldAdvice(record) {
   const reasons = record.reasonItems?.map((r) => r.text).join(', ')
-  const response = await ai.models.generateContent({
+  const response = await getAi().models.generateContent({
     model: 'gemini-3.5-flash-lite',
     contents: `
 상품명: ${record.name}
@@ -64,7 +72,7 @@ const REPLACEMENT_GOODS = `
 `
 
 const generate = async (prompt) => {
-  const response = await ai.models.generateContent({
+  const response = await getAi().models.generateContent({
     model: 'gemini-3.5-flash-lite',
     contents: prompt,
     config: {
