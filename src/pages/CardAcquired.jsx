@@ -69,8 +69,11 @@ export default function CardAcquired() {
     )
   }
 
-  // 안 사기로 한 건 참아낸 것을 축하하는 화면으로 간다
-  if (kind === 'saving') return <SavingCelebration />
+  // 추천을 받고도 안 산 경우. 절약으로 치지 않아 카드는 없지만 참아낸 건 축하한다.
+  // 보류·비추천에서 안 산 건 절약 카드를 얻으므로 아래 습득 화면으로 간다.
+  if (record?.choice === 'skip' && record.type === 'recommend') {
+    return <SavingCelebration />
+  }
 
   if (!kind) return <Navigate to='/reports' replace />
 
