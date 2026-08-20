@@ -44,6 +44,7 @@ export default function Report() {
               product={state.product}
               category={state.category}
               type={report.type}
+              reasonItems={report.cards[0]?.items ?? []}
               note={
                 usage &&
                 `한 번 사용할 때마다 ${usage.amount} 정도의 비용이에요.`

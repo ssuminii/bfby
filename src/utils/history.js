@@ -52,6 +52,7 @@ export const isGoodSpending = (record) =>
 export const cardKindOf = (record) => {
   if (isGoodSpending(record)) return 'good'
   if (isSaving(record)) return 'saving'
+  if (record.checkin?.resolved === 'buy') return 'good'
   if (record.choice === 'hold') return 'pending'
   return null
 }
@@ -75,4 +76,18 @@ export function saveDecision(record) {
     // 기록은 부가 기능이라 저장 실패가 상담 흐름을 막으면 안 된다
   }
   return saved
+}
+
+// hold 기록에 최종 결정(checkin)을 붙인다. at으로 레코드를 특정한다.
+export function resolveHold(at, resolved) {
+  try {
+    const history = loadHistory()
+    const updated = history.map((r) =>
+      r.at === at && r.choice === 'hold' ? { ...r, checkin: { resolved } } : r
+    )
+    localStorage.setItem(KEY, JSON.stringify(updated))
+    return updated.find((r) => r.at === at) ?? null
+  } catch {
+    return null
+  }
 }

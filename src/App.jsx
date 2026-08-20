@@ -4,10 +4,12 @@ import Home from "./pages/Home";
 import ConsultSetup from "./pages/ConsultSetup";
 import Reports from "./pages/Reports";
 import BuyOrNot from "./pages/BuyOrNot";
+import BuyOrNotDetail from "./pages/BuyOrNotDetail";
 import Consult from "./pages/Consult";
 import Report from "./pages/Report";
 import CardAcquired from "./pages/CardAcquired";
 import ReasonSurvey from "./pages/ReasonSurvey";
+import HoldDecision from "./pages/HoldDecision";
 
 function App() {
   return (
@@ -21,6 +23,8 @@ function App() {
               <Route path="/consult/setup" element={<ConsultSetup />} />
               <Route path="/reports" element={<Reports />} />
               <Route path="/buyornot" element={<BuyOrNot />} />
+              <Route path="/buyornot/detail" element={<BuyOrNotDetail />} />
+              <Route path="/buyornot/decide" element={<HoldDecision />} />
               <Route path="/consult" element={<Consult />} />
               <Route path="/report" element={<Report />} />
               <Route path="/report/card" element={<CardAcquired />} />
