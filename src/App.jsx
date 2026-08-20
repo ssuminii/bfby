@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Onboarding from "./pages/Onboarding";
 import Home from "./pages/Home";
@@ -10,8 +11,12 @@ import Report from "./pages/Report";
 import CardAcquired from "./pages/CardAcquired";
 import ReasonSurvey from "./pages/ReasonSurvey";
 import HoldDecision from "./pages/HoldDecision";
+import { preloadCardImages } from "./utils/preloadCardImages";
 
 function App() {
+  // 첫 화면을 그린 뒤에 카드 무늬를 미리 받아 둔다
+  useEffect(preloadCardImages, []);
+
   return (
     <BrowserRouter>
       <div className="min-h-dvh bg-gray-100 flex items-center justify-center">
