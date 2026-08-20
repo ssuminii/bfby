@@ -1,11 +1,25 @@
 const META_PATTERNS = {
   name: [/property=["']og:title["'][^>]*content=["']([^"']+)["']/i, /content=["']([^"']+)["'][^>]*property=["']og:title["']/i],
   image: [/property=["']og:image["'][^>]*content=["']([^"']+)["']/i, /content=["']([^"']+)["'][^>]*property=["']og:image["']/i],
+  description: [
+    /(?:name|property)=["']description["'][^>]*content=["']([^"']+)["']/i,
+    /content=["']([^"']+)["'][^>]*(?:name|property)=["']description["']/i,
+    /(?:name|property)=["']og:description["'][^>]*content=["']([^"']+)["']/i,
+    /content=["']([^"']+)["'][^>]*(?:name|property)=["']og:description["']/i,
+  ],
+  keywords: [
+    /(?:name|property)=["']keywords["'][^>]*content=["']([^"']+)["']/i,
+    /content=["']([^"']+)["'][^>]*(?:name|property)=["']keywords["']/i,
+  ],
+  title: [/<title[^>]*>([\s\S]*?)<\/title>/i],
   price: [
     /property=["'](?:product|og):price:amount["'][^>]*content=["']([^"']+)["']/i,
     /content=["']([^"']+)["'][^>]*property=["'](?:product|og):price:amount["']/i,
   ],
 }
+
+const HANGUL = /[가-힣]/
+const MODEL_CODE = /^[A-Za-z0-9][A-Za-z0-9/_ .-]*$/
 
 const matchFirst = (html, patterns) => {
   for (const pattern of patterns) {
@@ -22,6 +36,40 @@ const decodeEntities = (text) =>
     .replace(/&gt;/g, '>')
     .replace(/&quot;/g, '"')
     .replace(/&#0?39;|&apos;/g, "'") ?? null
+
+const cleanKoreanName = (value) => {
+  let name = decodeEntities(value)?.trim()
+  if (!name || !HANGUL.test(name)) return null
+
+  name = name
+    .replace(/\s*정품\s+안심\s+거래\s*\|\s*KREAM\s*$/i, '')
+    .replace(/\s*\|\s*KREAM\s*$/i, '')
+    .trim()
+
+  if (name.includes(',')) {
+    name = name.split(',').find((part) => HANGUL.test(part))?.trim() ?? name
+  }
+
+  name = name.replace(/\s*\(([^)]*)\)\s*$/g, (match, content) =>
+    HANGUL.test(content) || !MODEL_CODE.test(content) ? match : '',
+  ).trim()
+
+  return name && HANGUL.test(name) ? name : null
+}
+
+const koreanNameFromKeywords = (keywords) => {
+  const parts = decodeEntities(keywords)
+    ?.split(',')
+    .map((part) => part.trim())
+    .filter(Boolean) ?? []
+
+  return parts.find((part) => HANGUL.test(part) && !MODEL_CODE.test(part)) ?? null
+}
+
+const preferredKoreanName = (html) =>
+  koreanNameFromKeywords(matchFirst(html, META_PATTERNS.keywords))
+  ?? cleanKoreanName(matchFirst(html, META_PATTERNS.description))
+  ?? cleanKoreanName(matchFirst(html, META_PATTERNS.title))
 
 const removeTrailingCommas = (json) => {
   let normalized = ''
@@ -118,7 +166,7 @@ const parseJsonLd = (html) => {
 
 export default function parseProduct(html) {
   const jsonLd = parseJsonLd(html)
-  const name = decodeEntities(matchFirst(html, META_PATTERNS.name) ?? jsonLd.name)
+  const name = preferredKoreanName(html) ?? decodeEntities(matchFirst(html, META_PATTERNS.name) ?? jsonLd.name)
   const image = matchFirst(html, META_PATTERNS.image) ?? jsonLd.image
   const rawPrice = matchFirst(html, META_PATTERNS.price) ?? jsonLd.price
   const price = rawPrice ? Number(String(rawPrice).replace(/[^\d.]/g, '')) || null : null
