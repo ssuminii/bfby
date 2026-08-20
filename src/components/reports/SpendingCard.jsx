@@ -1,25 +1,15 @@
-import beautyImage from '../../assets/reports/beauty.png'
-import foodImage from '../../assets/reports/food.png'
-import hobbyImage from '../../assets/reports/hobby.png'
-import placeholderImage from '../../assets/reports/product-placeholder.png'
 import { PENDING_TIER, tierOf } from '../../constants/cardTier'
+import { iconOf } from '../../constants/categoryIcon'
 import { cardKindOf } from '../../utils/history'
 
-const CATEGORY_IMAGES = {
-  뷰티: beautyImage,
-  식품: foodImage,
-  '취미/이동': hobbyImage,
-}
-
 const CATEGORY_LABELS = {
-  '취미/이동': '취미',
+  '취미·운동': '취미',
 }
 
 const SIZES = {
   sm: {
     card: 'h-[152px] w-[104px] rounded-lg',
     product: 'size-[52px]',
-    photo: 'rounded-[6px]',
     topShadow: 'shadow-[inset_0_0_2px_rgba(0,0,0,0.24)]',
     body: 'gap-1',
     grade: 'w-20 px-3 text-bodyb tracking-[-0.14px]',
@@ -29,7 +19,6 @@ const SIZES = {
   lg: {
     card: 'h-[304px] w-[208px] rounded-2xl',
     product: 'size-[104px]',
-    photo: 'rounded-[12px]',
     topShadow: 'shadow-[inset_0_0_4px_rgba(0,0,0,0.24)]',
     body: 'gap-2',
     grade: 'w-40 px-6 text-[28px] leading-[1.5] tracking-[-0.28px]',
@@ -46,6 +35,7 @@ const REGRET_STYLE = {
   bottomShadow: 'shadow-[inset_0_0_4px_rgba(0,0,0,0.24)]',
 }
 
+// 아직 못 얻은 자리다. 가격 0짜리 카드로 그리면 등급까지 매겨져 실제 카드처럼 보인다.
 function EmptyCard({ style, variant }) {
   if (variant === 'regret') {
     return (
@@ -86,7 +76,6 @@ export default function SpendingCard({
   size = 'sm',
   transitionName,
   variant = 'default',
-  imageMode = 'auto',
 }) {
   const style = SIZES[size]
 
@@ -99,9 +88,6 @@ export default function SpendingCard({
   const tier = pending ? PENDING_TIER : tierOf(price)
   const category = record.category ?? '카테고리'
   const categoryLabel = CATEGORY_LABELS[category] ?? category
-  const shopImage = record.image
-  const categoryImage = CATEGORY_IMAGES[category] || placeholderImage
-  const image = imageMode === 'category' ? categoryImage : shopImage || categoryImage
   const isRegret = variant === 'regret'
   const topClass = isRegret ? REGRET_STYLE.top : tier.color
   const bottomClass = isRegret ? REGRET_STYLE.bottom : tier.color
@@ -126,12 +112,9 @@ export default function SpendingCard({
           />
         )}
         <img
-          src={image}
+          src={iconOf(category)}
           alt=''
-          referrerPolicy={image === shopImage ? 'no-referrer' : undefined}
-          className={`relative object-contain ${style.product} ${
-            image === shopImage ? `bg-white ${style.photo} shadow-[0_1px_4px_rgba(0,0,0,0.16)]` : ''
-          }`}
+          className={`relative object-contain ${style.product}`}
         />
         <span className={`pointer-events-none absolute inset-0 ${topShadow}`} />
       </div>

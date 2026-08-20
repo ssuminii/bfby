@@ -59,7 +59,6 @@ function CardGridSection({
                 record={record}
                 transitionName={landed ? 'acquired-card' : undefined}
                 variant={variant}
-                imageMode='category'
               />
             </div>
           )

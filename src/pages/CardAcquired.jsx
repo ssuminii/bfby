@@ -61,7 +61,8 @@ export default function CardAcquired() {
   const kind = record && cardKindOf(record);
 
   // 더 고민할게요는 결정을 미룬 것이라 카드가 아니라 살래말래 탭으로 간다
-  if (record?.choice === "hold") {
+
+  if (record?.choice === "hold" && !record.checkin?.resolved) {
     return (
       <PendingNotice
         title={"살래말래 탭에\n저장해 뒀어요."}
@@ -73,7 +74,11 @@ export default function CardAcquired() {
 
   // 추천을 받고도 안 산 경우. 절약으로 치지 않아 카드는 없지만 참아낸 건 축하한다.
   // 보류·비추천에서 안 산 건 절약 카드를 얻으므로 아래 습득 화면으로 간다.
-  if (record?.choice === "skip" && record.type === "recommend") {
+  // 그 자리에서 안 샀든, 살래말래에서 결국 안 샀든 결과는 같다
+  const endedUpSkipping =
+    record?.choice === "skip" || record?.checkin?.resolved === "skip";
+
+  if (endedUpSkipping && record.type === "recommend") {
     return <SavingCelebration />;
   }
 
