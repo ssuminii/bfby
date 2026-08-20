@@ -86,6 +86,7 @@ export default function SpendingCard({
   size = 'sm',
   transitionName,
   variant = 'default',
+  imageMode = 'auto',
 }) {
   const style = SIZES[size]
 
@@ -99,7 +100,8 @@ export default function SpendingCard({
   const category = record.category ?? '카테고리'
   const categoryLabel = CATEGORY_LABELS[category] ?? category
   const shopImage = record.image
-  const image = shopImage || CATEGORY_IMAGES[category] || placeholderImage
+  const categoryImage = CATEGORY_IMAGES[category] || placeholderImage
+  const image = imageMode === 'category' ? categoryImage : shopImage || categoryImage
   const isRegret = variant === 'regret'
   const topClass = isRegret ? REGRET_STYLE.top : tier.color
   const bottomClass = isRegret ? REGRET_STYLE.bottom : tier.color
@@ -126,9 +128,9 @@ export default function SpendingCard({
         <img
           src={image}
           alt=''
-          referrerPolicy={shopImage ? 'no-referrer' : undefined}
+          referrerPolicy={image === shopImage ? 'no-referrer' : undefined}
           className={`relative object-contain ${style.product} ${
-            shopImage ? `bg-white ${style.photo} shadow-[0_1px_4px_rgba(0,0,0,0.16)]` : ''
+            image === shopImage ? `bg-white ${style.photo} shadow-[0_1px_4px_rgba(0,0,0,0.16)]` : ''
           }`}
         />
         <span className={`pointer-events-none absolute inset-0 ${topShadow}`} />

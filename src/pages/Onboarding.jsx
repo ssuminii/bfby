@@ -12,6 +12,7 @@ export default function Onboarding() {
   const isReturn = localStorage.getItem(ONBOARDED_KEY) === 'true'
   const [step, setStep] = useState(isReturn ? 'link' : 'splash')
   const [link, setLink] = useState('')
+  const [showLinkBack, setShowLinkBack] = useState(false)
   const navigate = useNavigate()
 
   const next = () => {
@@ -32,10 +33,17 @@ export default function Onboarding() {
       {step === 'link' && (
         <LinkInput
           showHeader
-          onBack={isReturn ? undefined : () => setStep('category')}
-          hideBack={isReturn}
+          onBack={
+            showLinkBack
+              ? () => setStep('confirm')
+              : isReturn
+                ? undefined
+                : () => setStep('category')
+          }
+          hideBack={isReturn && !showLinkBack}
           onNext={(value) => {
             setLink(value)
+            setShowLinkBack(false)
             next()
           }}
         />
@@ -44,7 +52,10 @@ export default function Onboarding() {
         <ProductConfirm
           link={link}
           onNext={(product) => navigate('/consult', { state: { product } })}
-          onBack={() => setStep('link')}
+          onBack={() => {
+            setShowLinkBack(true)
+            setStep('link')
+          }}
         />
       )}
     </div>
