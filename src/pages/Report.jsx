@@ -31,20 +31,24 @@ export default function Report() {
       <Header title="상담 결과" />
       <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
         <div className="min-h-full" style={{ background: theme.gradient }}>
-          <div className="flex flex-col items-center px-6 pb-10">
-            <GaugeChart value={report.score} className="mt-20" />
-            <Verdict
-              title={theme.title}
-              subtitle={report.subtitle ?? theme.subtitle}
-            />
+          {/* 게이지·판정 / 카드 / 버튼을 같은 간격으로 떨어뜨린다 */}
+          <div className="flex flex-col gap-9 px-6 pb-10 pt-14">
+            <div className="flex flex-col items-center gap-[46px]">
+              <GaugeChart value={report.score} />
+              <Verdict
+                title={theme.title}
+                subtitle={report.subtitle ?? theme.subtitle}
+              />
+            </div>
+
             <CardList cards={report.cards} />
+
             <ReportActions
               actions={theme.actions}
               saving={report.saving}
               product={state.product}
               category={state.category}
               type={report.type}
-              reasonItems={report.cards[0]?.items ?? []}
               note={
                 usage &&
                 `한 번 사용할 때마다 ${usage.amount} 정도의 비용이에요.`

@@ -1,24 +1,23 @@
-import Tag from "../Tag";
-
+// 판단 신호. 걸림은 주의색, 주의는 경고색으로 세기를 구분한다.
 const TONES = {
-  good: { label: "좋음", bg: "bg-info" },
-  caution: { label: "걸림", bg: "bg-caution" },
-  warn: { label: "주의", bg: "bg-error" },
-};
+  good: { label: '좋음', bg: 'bg-info' },
+  caution: { label: '걸림', bg: 'bg-caution' },
+  warn: { label: '주의', bg: 'bg-error' },
+}
 
 export default function ReasonList({ items }) {
   return (
-    <ul className="w-full flex flex-col gap-3">
+    <ul className='flex w-full flex-col gap-3'>
       {items.map(({ tone, text }) => (
-        <li key={text} className="flex items-center gap-[11px]">
-          <Tag bg={TONES[tone].bg} className="shrink-0">
+        <li key={text} className='flex items-center gap-[11px]'>
+          <span
+            className={`flex h-5 shrink-0 items-center justify-center rounded-full px-2 text-body2b text-white ${TONES[tone].bg}`}
+          >
             {TONES[tone].label}
-          </Tag>
-          <p className="text-body2 font-medium text-gray-800 leading-[1.5] tracking-tight-1">
-            {text}
-          </p>
+          </span>
+          <p className='flex-1 text-result text-gray-600'>{text}</p>
         </li>
       ))}
     </ul>
-  );
+  )
 }

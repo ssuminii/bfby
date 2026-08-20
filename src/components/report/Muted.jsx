@@ -1,3 +1,3 @@
 export default function Muted({ children }) {
-  return <p className='text-body2 text-gray-500 leading-[1.5] whitespace-pre-line'>{children}</p>
+  return <p className='whitespace-pre-line text-result text-gray-600'>{children}</p>
 }

@@ -46,7 +46,7 @@ export default function ReportActions({
   };
 
   return (
-    <div className="w-full flex flex-col gap-3 mt-10">
+    <div className="w-full flex flex-col gap-3">
       {actions.map(({ key, label, variant }) => (
         <Button key={key} variant={variant} onClick={() => handle(key)}>
           {fillLabel(label, saving)}
