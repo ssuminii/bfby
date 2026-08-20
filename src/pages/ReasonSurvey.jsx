@@ -45,6 +45,7 @@ export default function ReasonSurvey() {
         type: state?.type,
         choice,
         reason: answer,
+        kind: state?.kind ?? null,
         usageAnswer: state?.usageAnswer ?? null,
         reasonItems: state?.reasonItems ?? [],
       };

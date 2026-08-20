@@ -1,5 +1,6 @@
 import { GoogleGenAI } from '@google/genai'
 import { shortName } from './history.js'
+import { kindsOf } from '../constants/productKind.js'
 
 let ai = null
 
@@ -332,6 +333,7 @@ export async function generateJudgment(productInfo, category, allQAs, pastRecord
   상품명: ${productInfo.name}
   가격: ${productInfo.price?.toLocaleString()}원
   카테고리: ${category}
+  이 카테고리의 소분류: ${kindsOf(category).join(', ') || '없음'}
 
   사용자의 질문과 답변:
   ${history}
@@ -509,6 +511,21 @@ ${REPLACEMENT_GOODS}
   JSON을 만들기 전에 네가 쓴 문장을 전부 소리 내어 읽어봐.
   말할 때 안 쓰는 표현이 하나라도 있으면 그 문장은 고쳐서 내보내.
   사용자가 답한 적 없는 내용을 단정한 문장이 있으면 그것도 고쳐.
+
+  [kind 고르기]
+
+  위에 적힌 소분류 중에서 이 상품에 맞는 걸 하나 골라 kind에 넣어.
+
+  나중에 지난 기록과 견줄 때 이 값이 같은 것끼리만 묶는다.
+  '전자기기'는 정수기와 태블릿을 같이 담을 만큼 넓어서, 이걸 안 고르면
+  정수기를 보는 사람에게 태블릿 이야기가 나간다.
+
+  - 목록에 없는 말을 새로 만들지 마. 반드시 적힌 것 중 하나를 그대로 써.
+  - 어디에 두고 어떻게 쓰는 물건인지를 기준으로 골라.
+    - 정수기, 공기청정기, 냉장고 → "집에 두는 가전"
+    - 태블릿, 스마트워치, 이어폰 → "휴대기기"
+    - 러닝화, 등산 배낭 → 운동에 쓰면 "아웃도어", 평소에 신고 들면 "신발·가방"
+  - 애매하면 사용자가 답한 쓰임새를 보고 골라.
 
   [reasons 작성 원칙]
 
@@ -854,6 +871,7 @@ ${REPLACEMENT_GOODS}
   답변: 커피포트만 있어요 / 주말에만 마실 것 같아요 / 할인해서 보게 됐어요 / 할부로 사야 해요
 
   {
+    "kind": "주방",
     "signals": [
       { "axis": "이미 있나", "answer": "커피포트만 있어요", "signal": "주의" },
       { "axis": "얼마나 쓸까", "answer": "주말에만 마실 것 같아요", "signal": "걸림" },
@@ -894,6 +912,7 @@ ${REPLACEMENT_GOODS}
 
   JSON 형식으로만 반환:
   {
+    "kind": "위에 적힌 소분류 중 하나",
     "signals": [
       {
         "axis": "축 이름",
