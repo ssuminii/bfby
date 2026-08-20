@@ -5,6 +5,17 @@ import fetchProductInfo from "../../utils/fetchProductInfo";
 import ManualProductInput from "./ManualProductInput";
 import ProductFetchError from "./ProductFetchError";
 
+const PRODUCT_RISK_TAGS = new Set([
+  "품절 임박",
+  "반품 불가",
+  "교환 불가",
+  "배송비 별도",
+  "해외 배송",
+]);
+
+const productRiskTags = (tags = []) =>
+  (Array.isArray(tags) ? tags : []).filter((tag) => PRODUCT_RISK_TAGS.has(tag));
+
 function ProductSkeleton() {
   return (
     <div
@@ -54,7 +65,7 @@ export default function ProductConfirm({ link, onNext, onBack }) {
         name: info.name ?? "상품명 정보 없음",
         image: info.image ?? null,
         price: info.price ?? null,
-        tags: info.tags ?? [],
+        tags: productRiskTags(info.tags),
         link,
       });
       setFetchStatus("ready");
