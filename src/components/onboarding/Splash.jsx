@@ -17,7 +17,7 @@ export default function Splash({ onNext }) {
         style={{ top: 'calc(50% + 0.5px)' }}
       >
         <p
-          className='text-body1 font-bold text-gray-800 text-center w-full'
+          className='text-body1 font-bold text-gray-800 text-center w-full whitespace-nowrap'
           style={{ letterSpacing: '-0.16px', lineHeight: 1.45 }}
         >
           {'후회 없는 소비를 위한 당신만의 비서'.split('').map((char, i) => (
