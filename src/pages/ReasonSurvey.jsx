@@ -34,7 +34,7 @@ export default function ReasonSurvey() {
     const holdAt = state?.holdAt;
     let saved;
     if (holdAt) {
-      saved = resolveHold(holdAt, choice) ?? { ...state, choice, reason: answer };
+      saved = resolveHold(holdAt, choice, { reason: answer }) ?? { ...state, choice, reason: answer };
     } else {
       const record = {
         name: product?.name,
