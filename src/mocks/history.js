@@ -1,23 +1,15 @@
 /**
- * 화면 확인용 임시 판단 기록. 실제 기록이 하나도 없을 때만 쓰인다.
- * 데이터가 쌓이기 시작하면 이 파일은 지운다.
- *
- * 절약 기록 6건의 합이 1,245,000원이고 전부 이번 달이라,
- * 리포트 화면에 "충동구매를 6번 참았고, 총 1,245,000원 절약"으로 뜬다.
- *
- * 카테고리는 상품 이미지가 있는 셋만 쓴다 (뷰티·식품·취미·운동).
- * 나머지는 placeholder로 떨어져 카드가 비어 보인다.
+ * 화면 확인용 임시 판단 기록.
+ * 실제 기록이 아직 없을 때도 리포트 페이지 구조를 볼 수 있게 도와준다.
  */
 
-// 이번 달 1일에 시간만 다르게 둔다.
-// 실제 기록이 항상 이보다 최신이어야 새로 담은 카드가 목록 맨 앞에 온다.
-const thisMonth = (hour) => {
+const thisMonth = (day, hour = 12) => {
   const now = new Date()
-  return new Date(now.getFullYear(), now.getMonth(), 1, hour).toISOString()
+  return new Date(now.getFullYear(), now.getMonth(), day, hour).toISOString()
 }
 
-const record = (hour, name, category, price, extra) => ({
-  at: thisMonth(hour),
+const record = (day, name, category, price, extra) => ({
+  at: thisMonth(day),
   name,
   category,
   price,
@@ -28,22 +20,32 @@ const saving = (...args) => record(...args, { type: 'avoid', choice: 'skip' })
 const bought = (...args) => record(...args, { type: 'recommend', choice: 'buy' })
 
 export const MOCK_HISTORY = [
-  // 절약한 소비 — 합계 1,245,000원
-  saving(2, '러닝머신', '취미·운동', 1_000_000),
-  saving(5, '앰플 세트', '뷰티', 120_000),
-  saving(9, '홍삼 스틱', '식품', 60_000),
-  saving(13, '요가매트', '취미·운동', 35_000),
-  saving(17, '비타민 세럼', '뷰티', 18_000),
-  saving(21, '프로틴', '식품', 12_000),
+  saving(2, '러닝 머신', '취미·운동', 1_000_000),
+  saving(4, '커플 세트', '뷰티', 120_000),
+  saving(6, '텍사스 스테이크', '식품', 60_000),
+  saving(8, '요가 매트', '취미·운동', 35_000),
+  saving(10, '비타민 드링크', '뷰티', 18_000),
+  saving(12, '프로틴 바', '식품', 12_000),
 
-  // 합리적인 소비
-  bought(3, '클라이밍화', '취미·운동', 189_000),
-  bought(7, '등산화', '취미·운동', 149_000),
-  bought(11, '수분 크림', '뷰티', 62_000),
-  bought(15, '견과류', '식품', 38_000),
-  bought(19, '선크림', '뷰티', 29_000),
-  bought(23, '원두', '식품', 24_000),
+  bought(3, '드라이백', '취미·운동', 189_000),
+  bought(5, '백팩', '취미·운동', 149_000),
+  bought(7, '선크림', '뷰티', 62_000),
+  bought(9, '견과류', '식품', 38_000),
+  bought(11, '핸드크림', '뷰티', 29_000),
+  bought(13, '만두', '식품', 24_000),
 
-  // 보류 — 아직 결정 전이라 등급 없이 회색 카드로 뜬다
-  record(25, '비타민 세럼 30ml', '뷰티', 45_000, { type: 'hold', choice: 'hold' }),
+  record(15, '미니 가습기', '취미·운동', 79_000, {
+    type: 'hold',
+    choice: 'buy',
+    checkin: { resolved: 'buy', satisfied: false },
+  }),
+  record(16, '크림 치즈 쿠키', '식품', 16_000, {
+    type: 'avoid',
+    choice: 'buy',
+    checkin: { resolved: 'buy', satisfied: false },
+  }),
+
+  record(18, '비타민 세럼 30ml', '뷰티', 45_000, { type: 'hold', choice: 'buy' }),
+  record(19, '블루투스 스피커', '취미·운동', 129_000, { type: 'avoid', choice: 'buy' }),
+  record(20, '프로틴 믹스', '식품', 34_000, { type: 'hold', choice: 'buy' }),
 ]

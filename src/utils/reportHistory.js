@@ -51,6 +51,15 @@ export const spendingCollections = (history) => ({
   saving: history.filter(isSaving).sort(byNewest),
 })
 
+export const regretDecisions = (history) =>
+  history
+    .filter(
+      (record) =>
+        record.checkin?.resolved === 'buy' &&
+        record.checkin?.satisfied === false
+    )
+    .sort(byNewest)
+
 // 카드 발급이 미뤄진 것들. 체크인에서 만족도를 들어야 카드가 정해진다.
 export const pendingDecisions = (history) =>
   history.filter(isPendingCard).sort(byNewest)

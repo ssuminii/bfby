@@ -83,6 +83,14 @@
   );
 }
 
+@utility no-scrollbar {
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 /* Typography */
 @utility text-display {
   font-size: 28px;

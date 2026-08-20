@@ -38,12 +38,13 @@ export const totalSaved = (history) =>
 /**
  * 좋은 소비로 칠지 판단한다.
  *
- * 추천을 받고 실제로 사기로 한 것만 좋은 소비다.
- * 보류·비추천에서 "그래도 살래요"를 누른 건 여기 들어가지 않는다.
+ * 추천을 받고 실제로 사기로 했거나,
+ * 보류·비추천 뒤 실제 사용 만족도가 좋았던 소비를 좋은 소비로 본다.
  * 절약과는 겹치지 않는다. 안 산 건 절약, 잘 산 건 좋은 소비다.
  */
 export const isGoodSpending = (record) =>
-  endedUpBuying(record) && record.type === 'recommend'
+  endedUpBuying(record) &&
+  (record.type === 'recommend' || record.checkin?.satisfied === true)
 
 // 만족도까지 답했는지. 답하기 전까지는 어떤 카드인지 정해지지 않는다.
 const hasSatisfaction = (record) => typeof record.checkin?.satisfied === 'boolean'
@@ -88,12 +89,16 @@ export function saveDecision(record) {
   return saved
 }
 
-// hold 기록에 최종 결정(checkin)을 붙인다. at으로 레코드를 특정한다.
-export function resolveHold(at, resolved) {
+// 보류 카드 기록에 최종 결정(checkin)을 붙인다. at으로 레코드를 특정한다.
+export function resolveHold(at, resolved, checkin = {}) {
   try {
     const history = loadHistory()
+    const nextCheckin =
+      typeof resolved === 'object' ? resolved : { resolved, ...checkin }
     const updated = history.map((r) =>
-      r.at === at && r.choice === 'hold' ? { ...r, checkin: { resolved } } : r
+      r.at === at && (r.choice === 'hold' || isPendingCard(r))
+        ? { ...r, checkin: nextCheckin }
+        : r
     )
     localStorage.setItem(KEY, JSON.stringify(updated))
     return updated.find((r) => r.at === at) ?? null

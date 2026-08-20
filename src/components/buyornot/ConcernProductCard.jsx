@@ -31,6 +31,7 @@ export default function ConcernProductCard({
             <img
               src={record.image}
               alt=""
+              referrerPolicy="no-referrer"
               className="size-13 rounded-lg object-cover shrink-0 bg-gray-100"
             />
           ) : (
