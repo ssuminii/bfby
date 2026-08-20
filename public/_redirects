@@ -1,2 +1,3 @@
+/api/product-info /.netlify/functions/product-info 200
 /api/* https://bfby-api.onrender.com/api/:splat 200
 /* /index.html 200
