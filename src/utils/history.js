@@ -128,3 +128,44 @@ export function resolveHold(at, resolved, checkin = {}, baseRecord = null) {
     return null
   }
 }
+
+// 같은 카테고리라도 200만원 냉장고와 8만원 키보드를 나란히 놓으면 남의 이야기가 된다.
+// '전자기기'처럼 넓은 카테고리에서 특히 그렇다.
+// 두 배 안쪽이면 "이만한 돈을 쓰는 일"로 묶여서 내 이야기로 읽힌다.
+const PRICE_BAND = 2
+
+export const withinPriceBand = (past, price) =>
+  Boolean(past && price) && (past > price ? past / price : price / past) <= PRICE_BAND
+
+export function comparableRecords(history, category, price) {
+  const sameCategory = history.filter((record) => record.category === category)
+  if (!price) return sameCategory
+  return sameCategory.filter((record) => withinPriceBand(record.price ?? 0, price))
+}
+
+// 괄호 안 설명과 용량·색상 같은 스펙 꼬리표
+const SPEC_TAIL = /[([{][^)\]}]*[)\]}]|\d+(\.\d+)?\s*(ml|L|g|kg|cm|mm|인치|호|매|입|구|color|p)\b/gi
+
+// 모델명(RF85C90F1AP), 브랜드 약자(LG), 연식(2025년형), 사양(4도어).
+// 무슨 물건인지를 말해주지 않는 것들이라 이름에서 걷어낸다.
+const NOT_A_THING = /^[A-Za-z][\dA-Za-z-]*$|^\d/
+
+/**
+ * 기록을 얘기할 땐 무슨 물건이었는지까지만 남긴다.
+ * '삼성 비스포크 냉장고 RF85C90F1AP 4도어'는 '냉장고'면 충분하고,
+ * 정확한 상품명을 되읊어봐야 그때 뭘 고민했는지가 더 잘 보이지도 않는다.
+ */
+export function shortName(name = '') {
+  const words = name
+    .replace(SPEC_TAIL, ' ')
+    .replace(/[-–—|,/]/g, ' ')
+    .split(/\s+/)
+    .filter(Boolean)
+
+  const things = words.filter((word) => !NOT_A_THING.test(word))
+  const last = things.at(-1)
+  if (!last) return words.at(-1) ?? name
+
+  // '머신', '세트'처럼 짧은 말은 혼자 두면 무슨 물건인지 알 수 없다
+  return last.length >= 3 ? last : things.slice(-2).join(' ')
+}
