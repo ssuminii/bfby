@@ -7,6 +7,7 @@ export default function ProductSummary({ name, price, image }) {
           <img
             src={image}
             alt=""
+            referrerPolicy="no-referrer"
             className="w-13 h-13 shrink-0 rounded-lg bg-white object-contain"
           />
         ) : (
