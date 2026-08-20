@@ -17,13 +17,8 @@ const iconOf = (title = '') =>
   ICON_BY_TITLE.find(([pattern]) => pattern.test(title))?.[1] ?? 'reason'
 
 export default function ReportCard({ card }) {
-  // 신호 목록은 줄 간격이 촘촘하고, 나머지는 문단이라 더 벌린다
-  const gap = card.items ? 'gap-4' : 'gap-6'
-
   return (
-    <section
-      className={`flex w-full flex-col items-start justify-center rounded-3xl bg-white p-6 drop-shadow-[0_0_3px_rgba(0,0,0,0.12)] ${gap}`}
-    >
+    <section className='flex w-full flex-col items-start justify-center gap-6 rounded-3xl bg-white p-6 drop-shadow-[0_0_3px_rgba(0,0,0,0.12)]'>
       <CardTitle icon={iconOf(card.title)}>{card.title}</CardTitle>
 
       {card.items && <ReasonList items={card.items} />}
@@ -32,6 +27,20 @@ export default function ReportCard({ card }) {
         <div className='flex w-full flex-col gap-4 px-2'>
           <Amount value={card.amount} formula={card.formula} />
           {card.footnotes && <Paragraphs items={card.footnotes} />}
+        </div>
+      )}
+
+      {card.options && (
+        <div className='flex w-full flex-col gap-3'>
+          {card.options.map((option, index) => (
+            <div key={option.lead} className='flex w-full flex-col gap-3'>
+              {index > 0 && <div className='h-px w-full bg-gray-100' />}
+              <div className='flex flex-col gap-1'>
+                <p className='text-result font-bold text-gray-800'>{option.lead}</p>
+                <p className='text-result text-gray-600'>{option.note}</p>
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
