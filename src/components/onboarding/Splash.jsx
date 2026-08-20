@@ -25,7 +25,7 @@ export default function Splash({ onNext }) {
               key={i}
               className='inline-block'
               style={{
-                animation: 'wave-char 2s ease-in-out 1',
+                animation: 'wave-char 1s ease-in-out 1',
                 animationDelay: `${i * 0.07}s`,
               }}
             >
