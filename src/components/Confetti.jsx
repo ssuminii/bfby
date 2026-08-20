@@ -1,40 +1,49 @@
-import { useMemo } from 'react'
+import { useEffect, useRef } from "react";
+import confetti from "canvas-confetti";
 
-// 서비스 팔레트에서 고른 색. 파랑을 주로 쓰고 금·초록으로 강세를 준다.
-const COLORS = [
-  'var(--color-blue-500)',
-  'var(--color-blue-300)',
-  'var(--color-report-card-gold)',
-  'var(--color-success)',
-  'var(--color-gray-300)',
-]
+const COLORS = ["#2f80ff", "#7fb0ff", "#ffc144", "#2fae66", "#c6cbd2"];
+export default function Confetti() {
+  const canvasRef = useRef(null);
 
-const between = (min, max) => min + Math.random() * (max - min)
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-/**
- * 위에서 떨어지며 도는 축하 조각들.
- * 조각마다 위치·속도·색이 달라야 자연스러워서 마운트할 때 한 번만 뽑는다.
- */
-export default function Confetti({ count = 28 }) {
-  const pieces = useMemo(
-    () =>
-      Array.from({ length: count }, () => ({
-        left: `${between(0, 100)}%`,
-        width: `${between(6, 11)}px`,
-        height: `${between(9, 16)}px`,
-        background: COLORS[Math.floor(Math.random() * COLORS.length)],
-        borderRadius: Math.random() < 0.3 ? '9999px' : '2px',
-        animationDelay: `${between(0, 1.6)}s`,
-        animationDuration: `${between(2.4, 4)}s`,
-      })),
-    [count],
-  )
+    const fire = confetti.create(canvasRef.current, { resize: true });
+    const burst = (delay, options) =>
+      setTimeout(
+        () =>
+          fire({
+            colors: COLORS,
+            startVelocity: 32,
+            gravity: 1.1,
+            decay: 0.91,
+            ticks: 120,
+            ...options,
+          }),
+        delay,
+      );
+
+    const timers = [
+      burst(0, { particleCount: 90, spread: 360, origin: { x: 0.5, y: 0.42 } }),
+
+      burst(180, {
+        particleCount: 40,
+        spread: 260,
+        origin: { x: 0.3, y: 0.5 },
+      }),
+    ];
+
+    return () => {
+      timers.forEach(clearTimeout);
+      fire.reset();
+    };
+  }, []);
 
   return (
-    <div aria-hidden className='pointer-events-none absolute inset-0 overflow-hidden'>
-      {pieces.map((style, i) => (
-        <span key={i} className='absolute top-0 animate-confetti' style={style} />
-      ))}
-    </div>
-  )
+    <canvas
+      ref={canvasRef}
+      aria-hidden
+      className="pointer-events-none absolute inset-0 size-full"
+    />
+  );
 }
