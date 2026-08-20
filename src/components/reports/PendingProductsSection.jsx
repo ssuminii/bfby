@@ -56,6 +56,7 @@ function ProductThumb({ record }) {
       <img
         src={record.image}
         alt=''
+        referrerPolicy='no-referrer'
         className='size-[52px] shrink-0 rounded-lg bg-gray-100 object-cover'
       />
     )

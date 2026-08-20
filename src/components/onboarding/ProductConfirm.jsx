@@ -118,6 +118,7 @@ export default function ProductConfirm({ link, onNext, onBack }) {
                 <img
                   src={product.image}
                   alt=""
+                  referrerPolicy="no-referrer"
                   className="max-w-full max-h-full object-contain"
                 />
               )}

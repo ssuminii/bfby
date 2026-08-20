@@ -126,6 +126,7 @@ export default function SpendingCard({
         <img
           src={image}
           alt=''
+          referrerPolicy={shopImage ? 'no-referrer' : undefined}
           className={`relative object-contain ${style.product} ${
             shopImage ? `bg-white ${style.photo} shadow-[0_1px_4px_rgba(0,0,0,0.16)]` : ''
           }`}
