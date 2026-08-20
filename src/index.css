@@ -245,3 +245,26 @@ body {
     animation: none;
   }
 }
+
+/* 축하 조각이 위에서 떨어지며 돈다 */
+@keyframes confetti-fall {
+  from {
+    transform: translate3d(0, -10%, 0) rotate(0deg);
+    opacity: 1;
+  }
+  to {
+    transform: translate3d(0, 100dvh, 0) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+@utility animate-confetti {
+  animation: confetti-fall linear infinite both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-confetti {
+    animation: none;
+    opacity: 0;
+  }
+}

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import Button from '../components/Button'
 import PendingNotice from '../components/report/PendingNotice'
+import SavingCelebration from '../components/report/SavingCelebration'
 import SpendingCard from '../components/reports/SpendingCard'
 import linkIcon from '../assets/icons/link.svg'
 import { tierOf } from '../constants/cardTier'
@@ -67,6 +68,9 @@ export default function CardAcquired() {
       />
     )
   }
+
+  // 안 사기로 한 건 참아낸 것을 축하하는 화면으로 간다
+  if (kind === 'saving') return <SavingCelebration />
 
   if (!kind) return <Navigate to='/reports' replace />
 
