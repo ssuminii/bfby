@@ -6,11 +6,10 @@
  *   choice  'buy' | 'skip' | 'hold'
  *   type    리포트 판정 ('recommend' | 'hold' | 'avoid')
  *
- * checkin은 choice가 'hold'인 기록에만 붙는다.
- * 안 사기로·사기로 한 건 그 자리에서 결정이 끝나서 다시 묻지 않는다.
+ * checkin은 두 가지를 담는다. 둘 다 붙을 수 있다.
  *
- *   { resolved: 'skip' }                        고민하다 결국 안 삼
- *   { resolved: 'buy', satisfied: true|false }  결국 샀고, 써보니 어땠는지
+ *   { resolved: 'buy' | 'skip' }  살래말래에서 내린 최종 결정
+ *   { satisfied: true | false }   말렸는데도 산 뒤 만족했는지
  *
  * ponytail: localStorage라 기기별로 따로 쌓인다. 계정이 생기면 서버로 옮긴다.
  */
@@ -23,10 +22,12 @@ const KEY = 'bfby.decisions'
  * 추천을 받고도 안 산 건 아낀 돈이 아니라 필요한 소비를 미룬 것에 가깝다.
  * 보류·비추천에서 안 사기로 한 것만 절약으로 본다.
  */
-// 그 자리에서 안 사기로 했든, 고민하다 결국 안 샀든 결과는 같다.
-// checkin은 choice가 'hold'인 기록에만 붙으므로 choice를 따로 볼 필요가 없다.
+// 그 자리에서 정했든, 살래말래에서 뒤늦게 정했든 결과는 같다
 const endedUpNotBuying = (record) =>
   record.choice === 'skip' || record.checkin?.resolved === 'skip'
+
+const endedUpBuying = (record) =>
+  record.choice === 'buy' || record.checkin?.resolved === 'buy'
 
 export const isSaving = (record) =>
   endedUpNotBuying(record) && record.type !== 'recommend'
@@ -42,14 +43,17 @@ export const totalSaved = (history) =>
  * 절약과는 겹치지 않는다. 안 산 건 절약, 잘 산 건 좋은 소비다.
  */
 export const isGoodSpending = (record) =>
-  record.choice === 'buy' && record.type === 'recommend'
+  endedUpBuying(record) && record.type === 'recommend'
+
+// 만족도까지 답했는지. 답하기 전까지는 어떤 카드인지 정해지지 않는다.
+const hasSatisfaction = (record) => typeof record.checkin?.satisfied === 'boolean'
 
 /**
  * 말렸는데도 산 경우. 잘한 소비인지 아직 알 수 없어 카드 발급을 미뤄 둔다.
- * 체크인에서 만족도를 듣고 나서야 카드가 정해진다.
+ * 살래말래에서 뒤늦게 사기로 한 것도 같다. 원래 판정이 말린 쪽이면 마찬가지다.
  */
 export const isPendingCard = (record) =>
-  record.choice === 'buy' && record.type !== 'recommend' && !record.checkin
+  endedUpBuying(record) && record.type !== 'recommend' && !hasSatisfaction(record)
 
 /**
  * 이번 결정으로 어떤 카드를 얻는지 판별한다. 얻는 카드가 없으면 null.
@@ -59,7 +63,6 @@ export const isPendingCard = (record) =>
 export const cardKindOf = (record) => {
   if (isGoodSpending(record)) return 'good'
   if (isSaving(record)) return 'saving'
-  if (record.checkin?.resolved === 'buy') return 'good'
   if (isPendingCard(record)) return 'pending'
   return null
 }
