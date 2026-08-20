@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import Button from '../components/Button'
-import HoldSaved from '../components/report/HoldSaved'
+import PendingNotice from '../components/report/PendingNotice'
 import SpendingCard from '../components/reports/SpendingCard'
 import linkIcon from '../assets/icons/link.svg'
 import { tierOf } from '../constants/cardTier'
@@ -57,10 +57,29 @@ export default function CardAcquired() {
   const record = state?.record ?? null
   const kind = record && cardKindOf(record)
 
+  // 더 고민할게요는 결정을 미룬 것이라 카드가 아니라 살래말래 탭으로 간다
+  if (record?.choice === 'hold') {
+    return (
+      <PendingNotice
+        title={'살래말래 탭에\n저장해 뒀어요.'}
+        caption='언제든 다시 열어서 결정할 수 있어요.'
+        to='/buyornot'
+      />
+    )
+  }
+
   if (!kind) return <Navigate to='/reports' replace />
 
-  // 보류는 카드 발급이 확정되기 전이라 습득 화면을 쓰지 않는다
-  if (kind === 'pending') return <HoldSaved />
+  // 말렸는데도 산 경우. 체크인에서 만족도를 들어야 카드가 정해진다
+  if (kind === 'pending') {
+    return (
+      <PendingNotice
+        title={'3일 뒤에 이 선택을\n다시 보여드릴게요.'}
+        caption={'그때 만족하셨는지 여쭤보고\n더 정확한 AI 조언에 사용할게요.'}
+        to='/reports'
+      />
+    )
+  }
 
   const copy = COPY[kind]
   const tier = tierOf(record.price ?? 0)
