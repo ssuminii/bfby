@@ -5,6 +5,8 @@ import { loadHistory } from '../../utils/history'
 
 const AXES = ['이미 있나', '얼마나 쓸까', '왜 하필 지금', '예산이 감당되는가']
 
+const BUDGET_OPTIONS = ['부담되지 않아요', '조금 부담돼요', '꽤 부담돼요', '많이 부담돼요']
+
 export default function QuestionSurvey({ productInfo, onDone }) {
   const [questions, setQuestions] = useState([])
   const [answers, setAnswers] = useState([])
@@ -72,7 +74,8 @@ export default function QuestionSurvey({ productInfo, onDone }) {
     setGenerating(true)
     setCurrentIndex(nextIndex)
     const nextQ = await generateNextQuestion(productInfo, category, newAnswers, axes[nextIndex])
-    setQuestions((prev) => [...prev, nextQ])
+    const isBudgetQ = axes[nextIndex] === 3
+    setQuestions((prev) => [...prev, isBudgetQ ? { ...nextQ, options: BUDGET_OPTIONS } : nextQ])
     setGenerating(false)
   }
 

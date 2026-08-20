@@ -5,7 +5,7 @@ import NavBar from '../components/NavBar'
 import CollectionSection from '../components/reports/CollectionSection'
 import SavingsOverview from '../components/reports/SavingsOverview'
 import { MOCK_HISTORY } from '../mocks/history'
-import { loadHistory } from '../utils/history'
+import { loadHistory, mergeHistory } from '../utils/history'
 import {
   pendingDecisions,
   regretDecisions,
@@ -15,7 +15,7 @@ import {
 
 export default function Reports() {
   const { state } = useLocation()
-  const [history, setHistory] = useState(() => [...MOCK_HISTORY, ...loadHistory()])
+  const [history, setHistory] = useState(() => mergeHistory(MOCK_HISTORY, loadHistory()))
   const summary = useMemo(() => reportHistorySummary(history), [history])
   const collections = useMemo(() => spendingCollections(history), [history])
   const regrets = useMemo(() => regretDecisions(history), [history])
