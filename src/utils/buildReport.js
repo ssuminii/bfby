@@ -132,6 +132,9 @@ function gapLabel(record) {
   return months <= 3 ? `${countWord(months)} 달 뒤엔` : `${months}개월 뒤엔`
 }
 
+// 기록을 부를 땐 값도 같이 붙인다. 얼마짜리였는지가 있어야 지금 값과 견줘진다.
+const named = (record) => `${shortName(record.name)}(${won(record.price ?? 0)})`
+
 /**
  * 얼마나 쓸지에 답한 말에서 쓰임의 결을 뽑는다.
  *
@@ -186,17 +189,30 @@ function pastStory(past, type, price, rhythm, now) {
   const connective = type === 'recommend' ? '라고 하셨고,' : '라고 하셨는데,'
 
   return (
-    `${whenLabel(pick.at, now)} 보셨던 ${shortName(pick.name)}도\n` +
+    `${whenLabel(pick.at, now)} 보셨던 ${named(pick)}도\n` +
     `**'${pick.usageAnswer}'**${connective}\n` +
     `${gapLabel(pick)} **'${pick.checkin.usage}'**라고 답하셨어요.`
   )
 }
 
+/**
+ * 지금 값이 이 소분류에서 겪어본 적 없는 크기일 때 그것부터 짚는다.
+ *
+ * 무엇을 사느냐보다 얼마를 쓰느냐가 먼저 체감되는 금액이 있다.
+ * 그 선을 넘었는지는 지난 기록만 보면 알 수 있으니 지어낼 것이 없다.
+ */
+function priciestLine(past, price, label) {
+  if (!price || past.length < 2) return null
+
+  const highest = Math.max(...past.map((record) => record.price ?? 0))
+  if (price <= highest) return null
+
+  return `지금까지 **${label}**에서 보신 것 중 **가장 큰 금액**이에요.`
+}
+
 // 이 카테고리에서 사고 나서 어땠는지의 비율.
 // 판정과 같은 쪽을 센다. 추천 카드에 후회율을 붙이면 카드가 자기 결론을 깎아먹는다.
-function outcomeRatio(past, category, type, kind) {
-  // 소분류를 알면 그 이름으로 말해야 무엇을 센 숫자인지 보인다
-  const label = kind ? `${category} 중 ${kind}` : `${category} 카테고리`
+function outcomeRatio(past, type, label) {
   const answered = past.filter((r) => typeof r.checkin?.satisfied === 'boolean')
   if (answered.length < 2) return null
 
@@ -234,7 +250,7 @@ function outcomeStory(comparable, type, price, rhythm, now) {
   if (!pick) return null
 
   return (
-    `${whenLabel(pick.at, now)} 보셨던 ${shortName(pick.name)}도 비슷한 값이었는데,\n` +
+    `${whenLabel(pick.at, now)} 보셨던 ${named(pick)}도 비슷한 값이었는데,\n` +
     `${outcomeOf(pick)}.`
   )
 }
@@ -254,7 +270,14 @@ function historyCard(history, category, price, type, rhythm, kind, now = new Dat
   const story =
     pastStory(comparable, type, price, rhythm, now) ??
     outcomeStory(comparable, type, price, rhythm, now)
-  const lines = [story, comparable.length && outcomeRatio(past, category, type, kind)].filter(Boolean)
+  // 소분류를 알면 그 이름으로 말해야 무엇을 센 숫자인지 보인다
+  const label = kind ? `${category} 중 ${kind}` : `${category} 카테고리`
+
+  const lines = [
+    priciestLine(past, price, label),
+    story,
+    comparable.length && outcomeRatio(past, type, label),
+  ].filter(Boolean)
 
   // 들려줄 이야기가 없으면 앞으로 쌓일 거라고만 알린다
   if (!lines.length) {
