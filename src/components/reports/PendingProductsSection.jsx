@@ -36,11 +36,6 @@ function daysSince(isoDate) {
   return Math.max(0, Math.floor((Date.now() - new Date(isoDate).getTime()) / DAY))
 }
 
-function daysUntilCheckin(record) {
-  if (!record?.at) return 3
-  return Math.max(0, 3 - daysSince(record.at))
-}
-
 function priceLabel(price) {
   return `${(price ?? 0).toLocaleString()}원`
 }
@@ -78,9 +73,6 @@ function ProductThumb({ record }) {
 }
 
 function PendingSlide({ record, index, total, onClick }) {
-  const remaining = daysUntilCheckin(record)
-  const timing = remaining > 0 ? `${remaining}일 뒤` : '오늘'
-
   return (
     <button
       type='button'
@@ -101,12 +93,7 @@ function PendingSlide({ record, index, total, onClick }) {
         </div>
       </div>
 
-      <div className='flex items-center justify-between pl-3'>
-        <p className='text-body2 text-gray-300'>
-          {record
-            ? `${timing} 이 상품의 만족도를 여쭤볼게요.`
-            : '며칠 뒤 이 상품의 만족도를 여쭤볼게요.'}
-        </p>
+      <div className='flex items-center justify-end pl-3'>
         <span className='rounded-full bg-gray-500 px-[10px] py-1 text-caption text-white'>
           {index + 1}/{total}
         </span>
@@ -594,7 +581,7 @@ export default function PendingProductsSection({ records, onResolveRecord }) {
         <p className='mt-1 text-body2 text-gray-500'>
           AI 조언에서 보류/비추천을 받았지만 구매를 결심한 상품들이에요.
           <br />
-          며칠 뒤 만족도를 알려주시면 그 결과가 카드로 남아요.
+          탭하고 사용 만족도를 남겨주시면 결과를 카드로 알려드려요.
         </p>
       </div>
 
