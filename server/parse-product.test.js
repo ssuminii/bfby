@@ -66,6 +66,47 @@ test('구매 전 놓치기 쉬운 조건만 상품 태그로 추출한다', () =
   })
 })
 
+test('Next.js 상품 데이터는 일반 description 문구보다 우선한다', () => {
+  const html = `
+    <title>스투시 x 아워레가시 서프맨 피그먼트 다이드 반팔 티셔츠 내츄럴 3904017 - 4910 | 사고 싶은 스타일의 발견</title>
+    <meta name="description" content="덜 고민하고, 더 나답게 고르는 패션">
+    <meta property="og:image" content="https://example.com/detail.jpg">
+    <script id="__NEXT_DATA__" type="application/json">
+      {
+        "props": {
+          "pageProps": {
+            "serverQueryClient": {
+              "queries": [
+                {
+                  "state": {
+                    "data": {
+                      "goods": {
+                        "name": "스투시 x 아워레가시 서프맨 피그먼트 다이드 반팔 티셔츠 내츄럴 3904017",
+                        "price": 114000,
+                        "image": "https://example.com/thumb.jpg",
+                        "delivery_fee": null,
+                        "is_limited": false,
+                        "is_overseas_delivery": false
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    </script>
+  `
+
+  assert.deepEqual(parseProduct(html), {
+    name: '스투시 x 아워레가시 서프맨 피그먼트 다이드 반팔 티셔츠 내츄럴 3904017',
+    image: 'https://example.com/detail.jpg',
+    price: 114000,
+    tags: [],
+  })
+})
+
 test('문자열 안의 쉼표는 JSON-LD 정규화 과정에서 유지한다', () => {
   const html = `
     <script type="application/ld+json">

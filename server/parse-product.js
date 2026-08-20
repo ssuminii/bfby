@@ -210,6 +210,79 @@ const riskTagsFromText = (html) => {
   )
 }
 
+const findNextGoods = (value) => {
+  if (!value || typeof value !== 'object') return null
+
+  const hasProductSignal =
+    value.price !== undefined
+    || value.original_price !== undefined
+    || value.first_page_rendering?.price !== undefined
+    || value.linked_option?.price !== undefined
+    || value.sku_code
+    || value.delivery_type
+    || value.standard_category
+
+  if (
+    typeof value.name === 'string'
+    && hasProductSignal
+  ) {
+    return value
+  }
+
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const goods = findNextGoods(item)
+      if (goods) return goods
+    }
+    return null
+  }
+
+  for (const item of Object.values(value)) {
+    const goods = findNextGoods(item)
+    if (goods) return goods
+  }
+
+  return null
+}
+
+const parseNextData = (html) => {
+  const match = /<script[^>]*id=["']__NEXT_DATA__["'][^>]*>([\s\S]*?)<\/script>/i.exec(html)
+  if (!match) return {}
+
+  try {
+    let data
+    try {
+      data = JSON.parse(match[1])
+    } catch {
+      data = JSON.parse(decodeEntities(match[1]) ?? match[1])
+    }
+    const goods = findNextGoods(data)
+    if (!goods) return {}
+
+    return {
+      name: goods.name ?? goods.first_page_rendering?.goods_name ?? null,
+      image:
+        goods.cover_image
+        ?? goods.first_page_rendering?.cover_image
+        ?? goods.image
+        ?? goods.image_webp
+        ?? null,
+      price:
+        goods.price
+        ?? goods.first_page_rendering?.price
+        ?? goods.linked_option?.price
+        ?? null,
+      tags: [
+        goods.is_limited ? '품절 임박' : null,
+        goods.delivery_fee ? '배송비 별도' : null,
+        goods.is_overseas_delivery ? '해외 배송' : null,
+      ].filter(Boolean),
+    }
+  } catch {
+    return {}
+  }
+}
+
 // JSON-LD의 Product 스키마에서 name/image/price/tags 보강
 const parseJsonLd = (html) => {
   const result = { tags: [] }
@@ -242,12 +315,16 @@ const parseJsonLd = (html) => {
 }
 
 export default function parseProduct(html) {
+  const nextData = parseNextData(html)
   const jsonLd = parseJsonLd(html)
-  const name = preferredKoreanName(html) ?? decodeEntities(matchFirst(html, META_PATTERNS.name) ?? jsonLd.name)
-  const image = matchFirst(html, META_PATTERNS.image) ?? jsonLd.image
-  const rawPrice = matchFirst(html, META_PATTERNS.price) ?? jsonLd.price
+  const name =
+    decodeEntities(nextData.name)?.trim()
+    ?? preferredKoreanName(html)
+    ?? decodeEntities(matchFirst(html, META_PATTERNS.name) ?? jsonLd.name)
+  const image = matchFirst(html, META_PATTERNS.image) ?? nextData.image ?? jsonLd.image
+  const rawPrice = matchFirst(html, META_PATTERNS.price) ?? nextData.price ?? jsonLd.price
   const price = rawPrice ? Number(String(rawPrice).replace(/[^\d.]/g, '')) || null : null
-  const detectedTags = new Set([...jsonLd.tags, ...riskTagsFromText(html)])
+  const detectedTags = new Set([...(nextData.tags ?? []), ...jsonLd.tags, ...riskTagsFromText(html)])
   const tags = PRODUCT_RISK_TAGS.filter((tag) => detectedTags.has(tag))
   return { name, image, price, tags }
 }
