@@ -6,6 +6,7 @@ import ReportActions from "../components/report/ReportActions";
 import Verdict from "../components/report/Verdict";
 import { REPORT_THEME } from "../constants/reportTheme";
 import { buildReport } from "../utils/buildReport";
+import { MOCK_HISTORY } from "../mocks/history";
 import { loadHistory } from "../utils/history";
 
 export default function Report() {
@@ -18,13 +19,19 @@ export default function Report() {
   const report = buildReport(
     state.judgment,
     state.product,
-    loadHistory(),
+    // 보관함과 같은 기록을 봐야 한다. 여기만 실제 기록만 쓰면 지난 선택과 견줄 수 없다.
+    // TODO: 기록이 쌓이면 MOCK_HISTORY 제거
+    [...MOCK_HISTORY, ...loadHistory()],
     state.category,
   );
   const theme = REPORT_THEME[report.type];
   const usage = report.cards.find((card) =>
     card.title.startsWith("한 번 사용할 때"),
   );
+  // 나중에 내 기록 카드가 "그때 이렇게 답하셨는데" 라고 말하려면 이 답변이 필요하다
+  const usageAnswer = state.judgment.signals?.find(
+    (signal) => signal.axis === "얼마나 쓸까",
+  )?.answer;
 
   return (
     <div className="flex h-full flex-col bg-white">
@@ -49,6 +56,7 @@ export default function Report() {
               product={state.product}
               category={state.category}
               type={report.type}
+              usageAnswer={usageAnswer}
               note={
                 usage &&
                 `한 번 사용할 때마다 ${usage.amount} 정도의 비용이에요.`

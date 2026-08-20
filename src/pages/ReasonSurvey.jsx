@@ -45,6 +45,7 @@ export default function ReasonSurvey() {
         type: state?.type,
         choice,
         reason: answer,
+        usageAnswer: state?.usageAnswer ?? null,
         reasonItems: state?.reasonItems ?? [],
       };
       saved = saveDecision(record);
