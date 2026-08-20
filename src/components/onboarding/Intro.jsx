@@ -2,7 +2,7 @@ import Button from '../Button'
 
 export default function Intro({ onNext }) {
   return (
-    <div className='flex flex-col items-center h-full bg-white px-6 pb-[42px]'>
+    <div className='flex flex-col items-center h-full bg-white px-6 pb-[42px] animate-rise-in'>
       <div className='flex-[3] min-h-6' />
 
       <div
