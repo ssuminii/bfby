@@ -5,8 +5,8 @@ import Card from "../components/Card";
 import Chip from "../components/Chip";
 import Button from "../components/Button";
 import NavBar from "../components/NavBar";
-import AiIcon from "../components/icons/AiIcon";
 import ReasonList from "../components/report/ReasonList";
+import CardTitle from "../components/report/CardTitle";
 import ConcernProductCard from "../components/buyornot/ConcernProductCard";
 import { REPORT_THEME } from "../constants/reportTheme";
 import { generateHoldAdvice } from "../utils/gemini";
@@ -20,7 +20,6 @@ const REASON_SECTION_TITLE = {
   avoid: "추천하지 않았던 이유",
 };
 
-// 리포트와 같은 칩을 쓴다. 판정에 따라 색만 갈린다.
 const ANSWER_TONE = {
   recommend: "info",
   hold: "caution",
@@ -43,15 +42,12 @@ export default function BuyOrNotDetail() {
       setAdvice(cached);
       return;
     }
-
     setAdviceLoading(true);
     generateHoldAdvice(record)
       .then((text) => {
         if (text) {
           setAdvice(text);
-          try {
-            localStorage.setItem(cacheKey, text);
-          } catch {}
+          try { localStorage.setItem(cacheKey, text); } catch {}
         }
       })
       .finally(() => setAdviceLoading(false));
@@ -71,49 +67,35 @@ export default function BuyOrNotDetail() {
   const answerTone = ANSWER_TONE[type] ?? "caution";
   const reasonTitle = REASON_SECTION_TITLE[type];
 
+  const tryFirstOptions = record.tryFirst
+    ? (Array.isArray(record.tryFirst) ? record.tryFirst : [record.tryFirst]).filter((o) => o?.lead)
+    : null;
+
   return (
     <div className="flex flex-col h-full">
       <Header />
 
-      <div
-        className="flex-1 min-h-0 overflow-y-auto"
-        style={{ background: gradient }}
-      >
-        <div className="flex flex-col gap-4 px-6 pt-6 pb-6">
+      <div className="flex-1 min-h-0 overflow-y-auto" style={{ background: gradient }}>
+        <div className="flex flex-col gap-9 px-6 pt-6 pb-6">
           <ConcernProductCard record={record} />
 
           {/* 그 때 이렇게 답하셨어요 */}
-          {record.reason && (
+          {record.signalAnswers?.length > 0 && (
             <Card className="bg-white p-6 flex flex-col gap-3">
               <p className="text-head text-gray-800">그 때 이렇게 답하셨어요</p>
               <div className="flex flex-wrap gap-2">
-                <Chip tone={answerTone}>{record.reason}</Chip>
+                {record.signalAnswers.map((answer) => (
+                  <Chip key={answer} tone={answerTone}>{answer}</Chip>
+                ))}
               </div>
             </Card>
           )}
 
-          {/* 추천/보류 이유 */}
+          {/* 보류/추천 이유 */}
           {record.reasonItems?.length > 0 && (
-            <Card className="bg-white p-6 flex flex-col gap-4">
-              <p className="text-head text-gray-800">{reasonTitle}</p>
+            <Card className="bg-white p-6 flex flex-col gap-6">
+              <CardTitle icon="reason">{reasonTitle}</CardTitle>
               <ReasonList items={record.reasonItems} />
-            </Card>
-          )}
-
-          {/* AI 조언 */}
-          {(advice || adviceLoading) && (
-            <Card className="bg-white p-6 flex flex-col gap-3">
-              <div className="flex gap-2 items-start">
-                <AiIcon className="shrink-0" />
-                <p className="text-head text-gray-800">다시 생각해봐요</p>
-              </div>
-              {adviceLoading ? (
-                <p className="text-body1 text-gray-400">
-                  조언을 불러오는 중이에요...
-                </p>
-              ) : (
-                <p className="text-body1 text-gray-800">{advice}</p>
-              )}
             </Card>
           )}
 
@@ -138,15 +120,42 @@ export default function BuyOrNotDetail() {
               }
 
               return (
-                <Card className="bg-white p-6 flex flex-col gap-3">
-                  <div className="flex gap-2 items-start">
-                    <AiIcon className="shrink-0" />
-                    <p className="text-head text-gray-800">{title}</p>
-                  </div>
-                  <p className="text-body1 text-gray-800">{body}</p>
+                <Card className="bg-white p-6 flex flex-col gap-6">
+                  <CardTitle icon="cost">{title}</CardTitle>
+                  <p className="text-result text-gray-600">{body}</p>
                 </Card>
               );
             })()}
+
+          {/* AI 조언 */}
+          {(advice || adviceLoading) && (
+            <Card className="bg-white p-6 flex flex-col gap-6">
+              <CardTitle icon="ai">다시 생각해봐요</CardTitle>
+              {adviceLoading ? (
+                <p className="text-result text-gray-400">조언을 불러오는 중이에요...</p>
+              ) : (
+                <p className="text-result text-gray-600">{advice}</p>
+              )}
+            </Card>
+          )}
+
+          {/* 이런 선택지도 있었어요 */}
+          {tryFirstOptions?.length > 0 && (
+            <Card className="bg-white p-6 flex flex-col gap-6">
+              <CardTitle icon="idea">이런 선택지도 있었어요</CardTitle>
+              <div className="flex flex-col gap-3">
+                {tryFirstOptions.map((option, index) => (
+                  <div key={option.lead} className="flex flex-col gap-3">
+                    {index > 0 && <div className="h-px w-full bg-gray-100" />}
+                    <div className="flex flex-col gap-1">
+                      <p className="text-result font-bold text-gray-800">{option.lead}</p>
+                      <p className="text-result text-gray-600">{option.note}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
         </div>
       </div>
 

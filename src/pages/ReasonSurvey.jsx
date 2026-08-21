@@ -46,7 +46,9 @@ export default function ReasonSurvey() {
         choice,
         reason: answer,
         usageAnswer: state?.usageAnswer ?? null,
+        signalAnswers: state?.signalAnswers ?? [],
         reasonItems: state?.reasonItems ?? [],
+        tryFirst: state?.tryFirst ?? null,
       };
       saved = saveDecision(record);
     }
