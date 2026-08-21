@@ -34,12 +34,8 @@ export default function CardIcon({ name }) {
   if (!src) return null;
 
   return (
-    <span className="relative block size-6 shrink-0 overflow-clip">
-      <img
-        src={src}
-        alt=""
-        className="absolute inset-0 size-full object-contain"
-      />
+    <span className="flex size-6 shrink-0 items-center justify-center">
+      <img src={src} alt="" className="h-[18px] w-[16px] object-contain" />
     </span>
   );
 }
