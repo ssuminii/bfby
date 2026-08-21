@@ -109,6 +109,48 @@ const preferredKoreanName = (html) =>
   ?? cleanKoreanName(matchFirst(html, META_PATTERNS.description))
   ?? cleanKoreanName(matchFirst(html, META_PATTERNS.title))
 
+const hasHost = (html, host) => new RegExp(`https?:\\/\\/[^"']*${host.replace('.', '\\.')}`, 'i').test(html)
+
+const isKreamPage = (html) => {
+  const kreamText = [
+    matchFirst(html, META_PATTERNS.title),
+    matchFirst(html, META_PATTERNS.description),
+    matchFirst(html, META_PATTERNS.keywords),
+  ].map((text) => decodeEntities(text) ?? '').join(' ')
+
+  return hasHost(html, 'kream.co.kr')
+    || /\|\s*KREAM/i.test(kreamText)
+    || /정품\s*(?:검수|안심)|실시간\s*시세/u.test(kreamText)
+}
+
+const cleanPageTitle = (value) => {
+  let name = decodeEntities(value)?.trim()
+  if (!name) return null
+
+  name = name
+    .replace(/\s+/g, ' ')
+    .replace(/\s+\|\s*(?:KREAM|MUSINSA|ZIGZAG|무신사|지그재그).*$/i, '')
+    .replace(/\s+-\s*(?:사이즈\s*&\s*후기|후기|리뷰).*$/i, '')
+    .trim()
+
+  return name || null
+}
+
+const musinsaNameFromDescription = (description) => {
+  const text = decodeEntities(description)
+  if (!text) return null
+
+  const match = /(?:^|\s)제품\s*[:：]\s*(.+)$/u.exec(text)
+  return match?.[1]
+    ?.replace(/\s*-\s*[\d,]+(?:\s*원)?\s*$/u, '')
+    .trim() || null
+}
+
+const knownSiteName = (html) =>
+  hasHost(html, 'musinsa.com')
+    ? musinsaNameFromDescription(matchFirst(html, META_PATTERNS.description))
+    : null
+
 const removeTrailingCommas = (json) => {
   let normalized = ''
   let inString = false
@@ -319,8 +361,9 @@ export default function parseProduct(html) {
   const jsonLd = parseJsonLd(html)
   const name =
     decodeEntities(nextData.name)?.trim()
-    ?? preferredKoreanName(html)
-    ?? decodeEntities(matchFirst(html, META_PATTERNS.name) ?? jsonLd.name)
+    ?? (isKreamPage(html) ? preferredKoreanName(html) : null)
+    ?? knownSiteName(html)
+    ?? cleanPageTitle(matchFirst(html, META_PATTERNS.name) ?? jsonLd.name)
   const image = matchFirst(html, META_PATTERNS.image) ?? nextData.image ?? jsonLd.image
   const rawPrice = matchFirst(html, META_PATTERNS.price) ?? nextData.price ?? jsonLd.price
   const price = rawPrice ? Number(String(rawPrice).replace(/[^\d.]/g, '')) || null : null

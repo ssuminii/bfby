@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useEffect, useMemo, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
 import NavBar from '../components/NavBar'
 import CollectionSection from '../components/reports/CollectionSection'
@@ -15,11 +15,20 @@ import {
 
 export default function Reports() {
   const { state } = useLocation()
+  const navigate = useNavigate()
+  const justAdded = state?.justAdded
   const [history, setHistory] = useState(() => mergeHistory(MOCK_HISTORY, loadHistory()))
   const summary = useMemo(() => reportHistorySummary(history), [history])
   const collections = useMemo(() => spendingCollections(history), [history])
   const regrets = useMemo(() => regretDecisions(history), [history])
   const pending = useMemo(() => pendingDecisions(history), [history])
+
+  // 남겨두면 다음 습득 때 view-transition-name이 둘이 되어 전환이 취소된다
+  useEffect(() => {
+    if (!justAdded) return undefined
+    const timer = setTimeout(() => navigate('.', { replace: true, state: null }), 1200)
+    return () => clearTimeout(timer)
+  }, [justAdded, navigate])
 
   const handleResolveRecord = (record) => {
     setHistory((current) => current.map((item) => (item.at === record.at ? record : item)))
@@ -35,7 +44,7 @@ export default function Reports() {
           collections={collections}
           regrets={regrets}
           pending={pending}
-          justAdded={state?.justAdded}
+          justAdded={justAdded}
           onResolveRecord={handleResolveRecord}
         />
       </main>
