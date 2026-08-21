@@ -2,6 +2,7 @@ import { Navigate, useLocation } from "react-router-dom";
 import Header from "../components/Header";
 import CardList from "../components/report/CardList";
 import GaugeChart from "../components/report/GaugeChart";
+import { markOf } from "../constants/resultMark";
 import ReportActions from "../components/report/ReportActions";
 import Verdict from "../components/report/Verdict";
 import { REPORT_THEME } from "../constants/reportTheme";
@@ -41,7 +42,17 @@ export default function Report() {
           {/* 게이지·판정 / 카드 / 버튼을 같은 간격으로 떨어뜨린다 */}
           <div className="flex flex-col gap-9 px-6 pb-10 pt-14">
             <div className="flex flex-col items-center gap-[46px]">
-              <GaugeChart value={report.score} />
+              {/* 게이지의 파란 구간(70~100점)은 오른쪽 위에 있다.
+                  그 위에 표정을 겹쳐 올린다. 위치는 left/top으로 조절하면 된다. */}
+              <div className="relative">
+                <GaugeChart value={report.score} />
+                <img
+                  src={markOf(report.type)}
+                  alt=""
+                  aria-hidden
+                  className="pointer-events-none absolute left-4/5 top-[68%] -translate-y-1/2"
+                />
+              </div>
               <Verdict
                 title={theme.title}
                 subtitle={report.subtitle ?? theme.subtitle}

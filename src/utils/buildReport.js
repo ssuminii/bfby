@@ -40,9 +40,9 @@ const TONE_BY_SIGNAL = {
 }
 
 const REASON_TITLE = {
-  recommend: '결과 근거',
+  recommend: '구매를 추천하는 이유',
   hold: '보류를 조언하는 이유',
-  avoid: '추천하지 않는 이유',
+  avoid: '구매를 추천하지 않는 이유',
 }
 
 // 게이지 구간(0-30 error / 30-70 caution / 70-100 info)과 판정이 어긋나지 않도록
