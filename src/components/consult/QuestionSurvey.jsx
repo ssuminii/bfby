@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Button from '../Button'
 import { generateFirstQuestion, generateNextQuestion, generateJudgment } from '../../utils/gemini'
-import { loadHistory } from '../../utils/history'
+import { comparableRecords, loadHistory } from '../../utils/history'
 
 const AXES = ['이미 있나', '얼마나 쓸까', '왜 하필 지금', '예산이 감당되는가']
 
@@ -57,12 +57,13 @@ export default function QuestionSurvey({ productInfo, onDone }) {
     if (nextIndex >= totalQuestions) {
       setPhase('loading')
       const [judgeResult] = await Promise.all([
-        // 같은 카테고리의 지난 결정을 넘겨 선택지 제안에 쓰게 한다
+        // 값이 비슷한 지난 결정만 넘긴다. 냉장고를 보는 사람에게
+        // 키보드 이야기를 꺼내면 남의 이야기로 읽힌다.
         generateJudgment(
           productInfo,
           category,
           newAnswers,
-          loadHistory().filter((record) => record.category === category),
+          comparableRecords(loadHistory(), category, productInfo.price),
         ),
         new Promise((resolve) => setTimeout(resolve, 2200)),
       ])
