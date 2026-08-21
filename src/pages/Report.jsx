@@ -33,6 +33,11 @@ export default function Report() {
   const usageAnswer = state.judgment.signals?.find(
     (signal) => signal.axis === "얼마나 쓸까",
   )?.answer;
+  const signalAnswers = (state.judgment.signals ?? [])
+    .map((s) => s.answer)
+    .filter(Boolean);
+  const reasonItems = report.cards[0]?.items
+  const tryFirst = state.judgment.tryFirst
 
   return (
     <div className="flex h-full flex-col bg-white">
@@ -67,7 +72,10 @@ export default function Report() {
               product={state.product}
               category={state.category}
               type={report.type}
+              reasonItems={reasonItems}
+              tryFirst={tryFirst}
               usageAnswer={usageAnswer}
+              signalAnswers={signalAnswers}
               kind={state.judgment.kind}
               note={
                 usage &&
