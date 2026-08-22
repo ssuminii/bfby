@@ -1,0 +1,12 @@
+name: Render Health Check
+
+on:
+  schedule:
+    - cron: '*/25 * * * *'
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping health endpoint
+        run: curl -f https://bfby-api.onrender.com/api/health
