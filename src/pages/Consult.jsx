@@ -1,14 +1,24 @@
 import { useState } from 'react'
-
-const STEPS = ['input', 'analyzing', 'questions', 'judging', 'report']
+import { useLocation, useNavigate } from 'react-router-dom'
+import QuestionSurvey from '../components/consult/QuestionSurvey'
 
 export default function Consult() {
-  const [step, setStep] = useState('input')
-  const [data, setData] = useState({ url: '', product: null, answers: {} })
+  const { state } = useLocation()
+  const productInfo = state?.product ?? null
+  const [, setAnswers] = useState([])
+  const navigate = useNavigate()
+
+  const finishQuestions = (result) => {
+    setAnswers(result.answers)
+    navigate('/report', {
+      replace: true,
+      state: { judgment: result.judgment, product: productInfo, category: result.category },
+    })
+  }
 
   return (
-    <div className="flex flex-col h-full">
-      {/* step별 컴포넌트 나중에 여기에 */}
+    <div className='flex flex-col h-full bg-white'>
+      <QuestionSurvey productInfo={productInfo} onDone={finishQuestions} />
     </div>
   )
 }

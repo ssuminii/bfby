@@ -52,8 +52,11 @@ fix: OG 이미지 파싱 오류 수정 (#34)
 src/
 ├── pages/
 │   ├── Onboarding.jsx   # 온보딩 (/)
-│   └── Consult.jsx      # 구매 상담 멀티스텝 (/consult)
+│   ├── Consult.jsx      # 구매 상담 멀티스텝 (/consult)
+│   └── Report.jsx       # 상담 결과 리포트 (/report)
 ├── components/          # 재사용 공통 컴포넌트
+├── constants/           # 화면 설정 상수 (리포트 타입별 테마 등)
+├── mocks/               # API 응답 목데이터 ⚠️ 실제 데이터 연결되면 삭제할 것
 ├── utils/               # API 호출, 유틸 함수
 ├── App.jsx
 ├── index.css            # Tailwind + 디자인 토큰
@@ -91,13 +94,25 @@ bg - gray - 50 // #F7F8FA  페이지 배경
 bg - gray - 100 // #EDEFF2  카드 배경
 bg - gray - 300 // #C6CBD2  border, divider
 bg - gray - 500 // #B8B9BA  placeholder
+bg - gray - 600 // #8B909A  보조 텍스트
 bg - gray - 800 // #23262B  본문 텍스트
 
 // Semantic
 bg - success // #2FAE66  구매 추천
 bg - error // #D9483D  재검토
 bg - caution // #C98A2E  주의
+
+// Report (리포트 화면 전용)
+report - recommend // #D6E5FF  추천 배경 그라데이션 중간색
+report - hold // #FFF4D6  보류 배경 그라데이션 중간색
+report - avoid // #E2E2E2  비추천 배경 그라데이션 중간색
+report - gauge - error // #DD4821  게이지 빨강 구간
+report - gauge - caution // #DEB040  게이지 노랑 구간
+report - gauge - info // #558EEA  게이지 파랑 구간
 ```
+
+> 게이지 색은 semantic 토큰(`error` / `caution` / `info`)보다 밝습니다.
+> 일러스트라 태그·버튼과 톤이 다릅니다. 섞어 쓰지 마세요.
 
 ### 타이포그래피
 
