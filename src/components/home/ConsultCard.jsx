@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import bulbImg from '../../assets/bulb.png'
+import bulbImg from '../../assets/bulb.webp'
 import Card from '../Card'
 
 export default function ConsultCard() {

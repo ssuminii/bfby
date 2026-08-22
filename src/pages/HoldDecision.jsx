@@ -4,7 +4,7 @@ import Button from '../components/Button'
 import NavBar from '../components/NavBar'
 import ConcernProductCard from '../components/buyornot/ConcernProductCard'
 import { resolveHold } from '../utils/history'
-import curiousImg from '../assets/curious.png'
+import curiousImg from '../assets/curious.webp'
 
 export default function HoldDecision() {
   const { state } = useLocation()
