@@ -73,7 +73,7 @@ const REPLACEMENT_GOODS = `
   교체형 상품이 아니라면 원래 축 의미를 그대로 쓰면 돼.
 `
 
-const generate = async (prompt) => {
+const generate = async (prompt, attempt = 0) => {
   const response = await getAi().models.generateContent({
     model: 'gemini-3.5-flash-lite',
     contents: prompt,
@@ -126,7 +126,18 @@ const generate = async (prompt) => {
     throw new Error('Gemini 응답이 비어 있습니다.')
   }
 
-  return JSON.parse(response.text)
+  const result = JSON.parse(response.text)
+
+  // 선택지가 4개 미만이거나 하나가 비정상적으로 길면 1회 재시도
+  if (
+    attempt === 0 &&
+    Array.isArray(result.options) &&
+    (result.options.length < 4 || result.options.some((o) => o.length > 30))
+  ) {
+    return generate(prompt, 1)
+  }
+
+  return result
 }
 
 export async function generateFirstQuestion(productInfo) {
